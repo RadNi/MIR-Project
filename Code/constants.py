@@ -1,0 +1,3 @@
+TOKEN_DELIM = '$'
+MIN_IOU = 0.5
+FARSI = True
