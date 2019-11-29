@@ -1,5 +1,6 @@
 import editdistance
 from Code.constants import MIN_IOU
+from Code.parser import Parser
 import hazm
 import nltk
 
@@ -14,20 +15,34 @@ class QueryCorrector:
             correct_words = []
             words = hazm.word_tokenize(query_string)
             for word in words:
-                correct_words.append(self.correct_word(word))
+                try:
+                    correct_words.append(self.correct_word(word))
+                except IndexError:
+                    print(f"Word cannot be corrected: {word}")
+                    correct_words.append(word)
             return " ".join(correct_words)
         else:
             correct_words = []
             words = nltk.tokenize.word_tokenize(query_string)
             for word in words:
-                correct_words.append(self.correct_word(word))
+                try:
+                    correct_words.append(self.correct_word(word))
+                except IndexError:
+                    print(f"Word cannot be corrected: {word}")
+                    correct_words.append(word)
             return " ".join(correct_words)
 
     def correct_word(self, the_word: str):
         grams: set = self.extract_bi_grams(the_word)
         word_set = set()
         for gram in grams:
-            word_set.update(set(self.grad_dict[gram]))
+            try:
+                word_set.update(set(self.grad_dict[gram]))
+            except KeyError:
+                try:
+                    word_set.update(set(self.grad_dict[gram.lower()]))
+                except KeyError:
+                    continue
         # Calculating IoU
         final_set = []
         for word in word_set:

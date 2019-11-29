@@ -22,6 +22,8 @@ class Searcher:
         print(corrected_query)
         normalized_query = self.parser.parse_text(text=corrected_query)
         current_posting: dict = self.postings_index.get(normalized_query[0])
+        if current_posting is None:
+            return []
         # Intersect all doc IDs
         doc_id_set = set(current_posting.keys())
         for word in set(normalized_query):
@@ -39,6 +41,8 @@ class Searcher:
         corrected_query = self.query_corrector.correct_query(query, mode)
         normalized_query = self.parser.parse_text(text=corrected_query)
         current_posting_list: dict = self.postings_index.get(normalized_query[0])
+        if current_posting_list is None:
+            return []
         # Intersect all doc IDs
         doc_id_set = set(current_posting_list.keys())
         for word in set(normalized_query):
@@ -59,7 +63,7 @@ class Searcher:
                 window_okay = True
                 for word in set(normalized_query):
                     position_array = np.array(self.postings_index.get(word).get(doc))
-                    if not np.any(window_start <= position_array < (window_start + window_size)):
+                    if not np.any((window_start <= position_array) & (position_array < (window_start + window_size))):
                         window_okay = False
                         break
                 if window_okay:
