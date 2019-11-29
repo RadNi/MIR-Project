@@ -1,3 +1,4 @@
+scipy
 editdistance
 bs4==0.0.1
 cycler==0.10.0

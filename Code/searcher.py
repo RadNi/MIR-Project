@@ -2,6 +2,7 @@ from Code.query_processor import QueryCorrector
 from Code.parser import Parser
 from Code.utils import VectorSpace
 import numpy as np
+import scipy.sparse
 
 
 class Searcher:
@@ -68,7 +69,7 @@ class Searcher:
 
         # rank by tf-idf
         query_vector = self.vector_space.calculate_query_vec(normalized_query)
-        final_doc_list.sort(key=lambda doc_id: np.dot(self.vector_space.doc_dict[doc_id], query_vector), reverse=True)
+        final_doc_list.sort(key=lambda doc_id: scipy.sparse.lil_matrix.dot(self.vector_space.doc_dict[doc_id].T, query_vector), reverse=True)
         if len(final_doc_list) > 15:
             final_doc_list = final_doc_list[:15]
         return final_doc_list

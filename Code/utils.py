@@ -2,6 +2,8 @@ import numpy as np
 from Code.indexer import Indexer
 from Code.parser import *
 from Code.constants import *
+import scipy.sparse
+import scipy.sparse.linalg
 
 
 class VectorSpace:
@@ -14,12 +16,12 @@ class VectorSpace:
         self.word_count = len(self.word2index)
 
     def add_doc_vec(self, doc_id, doc_word_set):
-        new_vec = np.zeros((self.word_count,))
+        new_vec = scipy.sparse.lil_matrix((self.word_count, 1))
         for word in doc_word_set:
             posting: dict = self.postings[word]
             idf = np.log2((self.doc_count + 1) / len(posting.keys()))
             tf = 1 + np.log2(len(posting[doc_id]))
-            new_vec[self.word2index.index(word)] = tf * idf
+            new_vec[0, self.word2index.index(word)] = tf * idf
         self.doc_dict[doc_id] = self._normalize(new_vec)
 
     def write_vec_to_file(self, filename):
@@ -28,7 +30,7 @@ class VectorSpace:
         #     f.write(str(self.doc_dict))
 
     def calculate_query_vec(self, query_words_list: list):
-        vec = np.zeros((self.word_count,))
+        vec = scipy.sparse.lil_matrix((self.word_count, 1))
         words_set = set(query_words_list)
         for word in words_set:
             count = query_words_list.count(word)
@@ -39,7 +41,7 @@ class VectorSpace:
 
     @staticmethod
     def _normalize(vec: np.array):
-        return vec / np.linalg.norm(vec)
+        return vec / scipy.sparse.linalg.norm(vec)
 
 
 if __name__ == '__main__':
