@@ -19,7 +19,7 @@ class Parser:
     def __init__(self, freq_threshould, common_words_filename):
         # self.freq_threshould = 40
         self.common_words = self._read_common_words(common_words_filename)
-        print(self.common_words)
+        # print(self.common_words)
         self.documents = []
         self.freq_threshould = freq_threshould
 
@@ -132,16 +132,16 @@ class EnglishParser(Parser):
 
     Delimiters = [';', '#', ')', '(', '.', ':', '/', '?']
 
-    def __init__(self, db_filename):
+    def __init__(self):
         common_words_filename = "english_common_words"
         super().__init__(freq_threshould=100, common_words_filename=common_words_filename)
 
         nltk.download('wordnet')
         self.normalizer = str.lower
         self.lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
-        print(self.lemmatizer("Hello"))
+        # print(self.lemmatizer("Hello"))
 
-        self.documents = self.read_english_documents(db_filename)
+        self.documents = self.read_english_documents("DataSet/English.csv")
 
     def _prepare_complete_text(self, doc):
         return doc
@@ -184,14 +184,14 @@ class PersianParser(Parser):
     def remove_commons_and_delimiters(self, elem):
         return self._remove_commons_and_delimiters(elem, PersianParser.Delimiters)
 
-    def __init__(self, db_filename):
+    def __init__(self):
         common_words_filename = "persian_common_words"
         super().__init__(freq_threshould=2500, common_words_filename=common_words_filename)
 
         self.normalizer = Normalizer().normalize
         self.lemmatizer = Lemmatizer().lemmatize
 
-        handler = open(db_filename).read()
+        handler = open("DataSet/Persian.xml").read()
         self.bs = BeautifulSoup(handler, features="lxml")
         self.pages = self.bs.find_all("page")
         self.documents = self.pages

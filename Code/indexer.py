@@ -1,4 +1,5 @@
 from Code.parser import *
+from Code.constants import *
 
 
 class Indexer:
@@ -8,10 +9,17 @@ class Indexer:
     In cases like this what should we do? (Lemmatizing)
     """
 
-    def __init__(self, parser):
-        self.parser = parser
-        self.persian_posting_list = dict()
-        self.persian_bigram_index = {}
+    def __init__(self, mode):
+        if mode == 'persian':
+            self.parser = PersianParser()
+            self.bigram_index_filename = "persian_bigram"
+            self.index_filename = "persian_index"
+        elif mode == 'english':
+            self.parser = EnglishParser()
+            self.bigram_index_filename = "english_bigram"
+            self.index_filename = "english_index"
+        self.posting_list = dict()
+        self.bigram_index = {}
 
     def index(self):
         docids = self.parser.get_docids()
@@ -26,6 +34,10 @@ class Indexer:
             # print(self.persian_posting_list)
             # input(self.persian_posting_list)
         self._write_index_to_file()
+
+    def index_single_doc(self, docid):
+        index = self.parser.parse_doc(docid)
+        return self._get_duplicates_with_info(index)
 
     # def index_doc(self, docId):
     #     tokens = self.parser.parse_page(docId)
@@ -51,10 +63,10 @@ class Indexer:
 
     def _merge_index(self, table, id):
         for term in table:
-            if term in self.persian_posting_list:
-                self.persian_posting_list[term][id] = table[term]
+            if term in self.posting_list:
+                self.posting_list[term][id] = table[term]
             else:
-                self.persian_posting_list[term] = {id: table[term]}
+                self.posting_list[term] = {id: table[term]}
 
     def _get_duplicates_with_info(self, list_of_elems):
         ''' Get duplicate element in a list along with their indices in list
@@ -82,12 +94,13 @@ class Indexer:
         return dict_of_elems
 
     def _write_index_to_file(self):
-        with open("english_index", "w") as f:
-            f.write(str(self.persian_posting_list))
+        with open(self.index_filename, "w") as f:
+            f.write(str(self.posting_list))
 
     def read_index_table(self):
-        with open("english_index", "r") as f:
-            return f.read()
+        print("Reading index table ...")
+        with open(self.index_filename, "r") as f:
+            return eval(f.read())
 
     def _create_all_terms(self, page_id):
         all_terms = set()
@@ -103,29 +116,27 @@ class Indexer:
         l = list(term)
         for i in range(len(l) - 1):
             bigram = "".join(c for c in l[i:i + 2])
-            if bigram in self.persian_bigram_index:
-                if term not in self.persian_bigram_index[bigram]:
-                    self.persian_bigram_index[bigram].append(term)
+            if bigram in self.bigram_index:
+                if term not in self.bigram_index[bigram]:
+                    self.bigram_index[bigram].append(term)
                 # else:
                 #     print(self.persian_bigram_index[bigram], bigram)
                 #     input(term)
                 # input()
             else:
-                self.persian_bigram_index[bigram] = [term]
+                self.bigram_index[bigram] = [term]
 
     def _write_bigram_to_file(self):
-        with open("english_bigram", "w") as f:
-            f.write(str(self.persian_bigram_index))
+        with open(self.bigram_index_filename, "w") as f:
+            f.write(str(self.bigram_index))
 
     def read_bigram(self):
-        with open("english_bigram", "r") as f:
-            return f.read()
+        with open(self.bigram_index_filename, "r") as f:
+            return eval(f.read())
 
 
 if __name__ == '__main__':
-    p = EnglishParser("DataSet/English.csv")
-    # p = PersianParser("DataSet/Persian.xml")
-    ind = Indexer(p)
+    ind = Indexer(MODE)
     ind.index()
     ind.create_bigram_index()
     # ind.index_persian()

@@ -1,3 +1,3 @@
 TOKEN_DELIM = '$'
 MIN_IOU = 0.5
-FARSI = True
+MODE = ["english", "persian"][1]
