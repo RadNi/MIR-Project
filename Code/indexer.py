@@ -8,25 +8,24 @@ class Indexer:
     In cases like this what should we do? (Lemmatizing)
     """
 
-    def __init__(self, filename):
-        self.filename = filename
-        self.parser = PersianParser(filename)
+    def __init__(self, parser):
+        self.parser = parser
         self.persian_posting_list = dict()
         self.persian_bigram_index = {}
 
-    def index_persian(self):
+    def index(self):
         docids = self.parser.get_docids()
         i = 1
         for id in docids:
             print(id, ":", i, "/", len(docids))
             i += 1
-            ind = self.parser.parse_page(id)
+            ind = self.parser.parse_doc(id)
             # print(ind)
-            table = self.get_duplicates_with_info(ind)
-            self.merge_index(table, id)
+            table = self._get_duplicates_with_info(ind)
+            self._merge_index(table, id)
             # print(self.persian_posting_list)
             # input(self.persian_posting_list)
-        # self._write_index_to_file()
+        self._write_index_to_file()
 
     # def index_doc(self, docId):
     #     tokens = self.parser.parse_page(docId)
@@ -38,28 +37,26 @@ class Indexer:
     # def get_docids(self):
     #     return self.parser.get_docids()
 
-    def create_persian_bigram_index(self):
+    def create_bigram_index(self):
 
         docids = self.parser.get_docids()
         i = 1
         for id in docids:
             print(id, ":", i, "/", len(docids))
             i += 1
-            all_terms = self._create_all_persian_terms(id)
+            all_terms = self._create_all_terms(id)
             for term in all_terms:
                 self._add_term_to_bigram(term)
-        self._write_persian_bigram_to_file()
+        self._write_bigram_to_file()
 
-    def merge_index(self, table, id):
+    def _merge_index(self, table, id):
         for term in table:
             if term in self.persian_posting_list:
                 self.persian_posting_list[term][id] = table[term]
-                print(term)
-                input(self.persian_posting_list)
             else:
                 self.persian_posting_list[term] = {id: table[term]}
 
-    def get_duplicates_with_info(self, list_of_elems):
+    def _get_duplicates_with_info(self, list_of_elems):
         ''' Get duplicate element in a list along with their indices in list
          and frequency count '''
         dict_of_elems = dict()
@@ -69,6 +66,7 @@ class Indexer:
             # print(elem)
             # If element exists in dict then keep its index in lisr & increment its frequency
             new_elem = self.parser.remove_commons_and_delimiters(elem)
+            # print(elem, new_elem)
             if new_elem:
                 prepared = self.parser.parse_text(new_elem, only_tokenize=False, remove_del=False)
                 if len(prepared) > 0:
@@ -84,16 +82,16 @@ class Indexer:
         return dict_of_elems
 
     def _write_index_to_file(self):
-        with open("persian_indexـ۲", "w") as f:
+        with open("english_index", "w") as f:
             f.write(str(self.persian_posting_list))
 
-    def read_persian_index(self):
-        with open("persian_index", "r") as f:
+    def read_index_table(self):
+        with open("english_index", "r") as f:
             return f.read()
 
-    def _create_all_persian_terms(self, page_id):
+    def _create_all_terms(self, page_id):
         all_terms = set()
-        ind = self.parser.parse_page(page_id, only_tokenize=True, remove_del=True, verbose=False)
+        ind = self.parser.parse_doc(page_id, only_tokenize=True, remove_del=True, verbose=False)
         # input(ind)
         for term in ind:
             new_term = self.parser.remove_commons_and_delimiters(term)
@@ -115,19 +113,21 @@ class Indexer:
             else:
                 self.persian_bigram_index[bigram] = [term]
 
-    def _write_persian_bigram_to_file(self):
-        with open("persian_bigram_2", "w") as f:
+    def _write_bigram_to_file(self):
+        with open("english_bigram", "w") as f:
             f.write(str(self.persian_bigram_index))
 
-    def read_persian_bigram(self):
-        with open("persian_bigram", "r") as f:
+    def read_bigram(self):
+        with open("english_bigram", "r") as f:
             return f.read()
 
 
 if __name__ == '__main__':
-    ind = Indexer("DataSet/Persian.xml")
-    ind.index_persian()
-    # ind.create_persian_bigram_index()
+    p = EnglishParser("DataSet/English.csv")
+    # p = PersianParser("DataSet/Persian.xml")
+    ind = Indexer(p)
+    ind.index()
+    ind.create_bigram_index()
     # ind.index_persian()
     # ind.read_persian_bigram()
     # print(ind.index_doc(ind.get_docids()[-1]))
