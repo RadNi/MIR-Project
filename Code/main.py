@@ -69,9 +69,9 @@ Select language:
         else:
             invalid()
     if mode == "english":
-        parser = EnglishParser
+        parser = EnglishParser()
     else:
-        parser = PersianParser
+        parser = PersianParser()
     indexer = Indexer(mode)
     index_table = indexer.read_index_table()
     bigram_table = indexer.read_bigram()
