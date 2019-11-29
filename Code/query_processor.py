@@ -5,8 +5,8 @@ import nltk
 
 
 class QueryCorrector:
-    def __init__(self, bi_gram_index: list):
-        self.index_list: list = bi_gram_index
+    def __init__(self, bi_gram_dict: dict):
+        self.grad_dict: dict = bi_gram_dict
         # indexes are lists of tuples
 
     def correct_query(self, query_string: str, mode):
@@ -27,10 +27,7 @@ class QueryCorrector:
         grams: set = self.extract_bi_grams(word)
         word_set = set()
         for gram in grams:
-            for item in self.index_list:
-                if item[0] == gram:
-                    word_set.update(set(item[1]))
-                    break
+            word_set.update(set(self.grad_dict[gram]))
         # Calculating IoU
         final_set = []
         for word in word_set:
