@@ -8,12 +8,17 @@ import math
 
 class VectorSpace:
 
-    def __init__(self, postings_index: dict, total_doc_count: int):
+    def __init__(self, postings_index: dict, total_doc_count: int = 0, model: dict = {}):
         self.postings = postings_index
-        self.doc_count = total_doc_count
         self.word2index = list(postings_index.keys())
-        self.doc_dict = {}
         self.word_count = len(self.word2index)
+
+        if len(model.keys()) == 0:
+            self.doc_count = total_doc_count
+            self.doc_dict = {}
+        else:
+            self.doc_count = len(model.keys())
+            self.doc_dict = model
 
     def add_doc_vec(self, doc_id, word_set):
         self.doc_dict[doc_id] = set(word_set)

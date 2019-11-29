@@ -21,16 +21,16 @@ class Searcher:
         corrected_query = self.query_corrector.correct_query(query, mode)
         print(corrected_query)
         normalized_query = self.parser.parse_text(text=corrected_query)
-        current_posting_list = self.postings_index.get(normalized_query[0])
+        current_posting: dict = self.postings_index.get(normalized_query[0])
         # Intersect all doc IDs
-        doc_id_set = set([posting.keys() for posting in current_posting_list])
+        doc_id_set = set(current_posting.keys())
         for word in set(normalized_query):
-            current_posting_list = self.postings_index.get(word)
-            doc_id_set.intersection_update(set([posting.keys() for posting in current_posting_list]))
+            current_posting_list: dict = self.postings_index.get(word)
+            doc_id_set.intersection_update(set(current_posting_list.keys()))
         # rank by tf-idf
         query_vector = self.vector_space.calculate_query_vec(normalized_query)
         doc_id_list = list(doc_id_set)
-        doc_id_list.sort(key=lambda doc_id: np.dot(self.vector_space.doc_dict[doc_id], query_vector), reverse=True)
+        doc_id_list.sort(key=lambda doc_id: np.dot(self.vector_space.get_doc_vec(doc_id).T, query_vector)[0, 0], reverse=True)
         if len(doc_id_list) > 15:
             doc_id_list = doc_id_list[:15]
         return doc_id_list
@@ -38,12 +38,12 @@ class Searcher:
     def proximity_search(self, query, window_size:int, mode):
         corrected_query = self.query_corrector.correct_query(query, mode)
         normalized_query = self.parser.parse_text(text=corrected_query)
-        current_posting_list = self.postings_index.get(normalized_query[0])
+        current_posting_list: dict = self.postings_index.get(normalized_query[0])
         # Intersect all doc IDs
-        doc_id_set = set([posting.keys() for posting in current_posting_list])
+        doc_id_set = set(current_posting_list.keys())
         for word in set(normalized_query):
-            current_posting_list = self.postings_index.get(word)
-            doc_id_set.intersection_update(set([posting.keys() for posting in current_posting_list]))
+            current_posting_list: dict = self.postings_index.get(word)
+            doc_id_set.intersection_update(set(current_posting_list.keys()))
         # Check proximity
         final_doc_list = []
         for doc in doc_id_set:
@@ -70,7 +70,7 @@ class Searcher:
 
         # rank by tf-idf
         query_vector = self.vector_space.calculate_query_vec(normalized_query)
-        final_doc_list.sort(key=lambda doc_id: scipy.sparse.lil_matrix.dot(self.vector_space.doc_dict[doc_id].T, query_vector), reverse=True)
+        final_doc_list.sort(key=lambda doc_id: scipy.sparse.lil_matrix.dot(self.vector_space.get_doc_vec(doc_id).T, query_vector)[0, 0], reverse=True)
         if len(final_doc_list) > 15:
             final_doc_list = final_doc_list[:15]
         return final_doc_list

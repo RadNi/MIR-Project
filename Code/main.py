@@ -76,8 +76,9 @@ Select language:
     index_table = indexer.read_index_table()
     bigram_table = indexer.read_bigram()
     vector_space_model = VectorSpace.read_vector_space_model(mode)
+    vector_space = VectorSpace(index_table, model=vector_space_model)
     query_corrector = QueryCorrector(bigram_table)
-    searcher = Searcher(query_corrector, index_table, parser, vector_space_model)
+    searcher = Searcher(query_corrector, index_table, parser, vector_space)
     while True:
         selection = input("""
 Which part do you want to test?
