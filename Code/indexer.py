@@ -80,11 +80,6 @@ class Indexer:
         with open(self.bigram_index_filename, "w", encoding="utf8") as f:
             f.write(str(self.bigram_index))
 
-    def read_index_table(self):
-        print("Reading index table ...")
-        with open(self.index_filename, "r") as f:
-            return eval(f.read())
-
     def read_bigram(self):
         with open(self.bigram_index_filename, "r", encoding="utf8") as f:
             return eval(f.read())
