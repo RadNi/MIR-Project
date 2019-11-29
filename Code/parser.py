@@ -6,11 +6,11 @@ import nltk.stem
 
 
 class Parser:
-
     """
     Shall we ignore nim-fasele?
     What's the policy?
     """
+
     def __init__(self, freq_threshold, common_words_filename):
         self.common_words_filename = common_words_filename
         self.common_words = self._read_common_words(common_words_filename)
@@ -48,7 +48,7 @@ class Parser:
         return res
 
     def _read_common_words(self, filename):
-        with open(filename, 'r') as f:
+        with open(filename, 'r', encoding="utf8") as f:
             return eval(f.read())
 
     def _prepare_text(self, text, remove_del=False, verbose=False, only_tokenize=False):
@@ -103,7 +103,6 @@ class Parser:
 
 
 class EnglishParser(Parser):
-
     Delimiters = [';', '#', ')', '(', '.', ':', '/', '?']
 
     def __init__(self):
@@ -145,7 +144,6 @@ class EnglishParser(Parser):
 
 
 class PersianParser(Parser):
-
     Delimiters = [
         ".", "[", "\n", "]", "{", "}", "\"", "'",
         "|", ",", " ", ":", "=", "(", ")",
