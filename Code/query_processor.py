@@ -1,6 +1,7 @@
 import editdistance
 from Code.constants import MIN_IOU, FARSI
-from hazm import word_tokenize
+import hazm
+import nltk
 
 
 class QueryCorrector:
@@ -11,7 +12,13 @@ class QueryCorrector:
     def correct_query(self, query_string: str):
         if FARSI:
             correct_words = []
-            words = word_tokenize(query_string)
+            words = hazm.word_tokenize(query_string)
+            for word in words:
+                correct_words.append(self.correct_word(word))
+            return " ".join(correct_words)
+        else:
+            correct_words = []
+            words = nltk.tokenize.word_tokenize(query_string)
             for word in words:
                 correct_words.append(self.correct_word(word))
             return " ".join(correct_words)
