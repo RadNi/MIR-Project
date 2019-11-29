@@ -1,3 +1,10 @@
+from Code.query_processor import QueryCorrector
+from Code.searcher import Searcher
+from Code.parser import PersianParser, EnglishParser
+from Code.utils import VectorSpace
+from Code.indexer import Indexer
+
+
 def print_line():
     print("-------------------------------\n")
 
