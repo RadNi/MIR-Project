@@ -38,7 +38,7 @@ class Parser:
 
     def extract_common_words(self):
         comp_text = " ".join(self._pick_desired_tags(p) for p in self.pages)
-        term_array = self._prepare_text(comp_text)
+        term_array = self._prepare_text(comp_text, verbose=False)
         candidates = Counter(term_array).most_common(86)
         temp = []
         for k, v in candidates:
@@ -79,15 +79,18 @@ class Parser:
 
         return res
 
-    def _prepare_text(self, text, remove_del=True):
+    def _prepare_text(self, text, remove_del=True, verbose=False):
         if remove_del:
             text = self._rm_delimiters(text)
         doc_nr = self._normalize_doc(text)
-        print("Normalized")
+        if verbose:
+            print("Normalized", doc_nr)
         tokens = self._tokenize(doc_nr)
-        print("Tokenized")
+        if verbose:
+            print("Tokenized", tokens)
         tokens_lm = self._lemmatize_tokens(tokens)
-        print("Lemmatized")
+        if verbose:
+            print("Lemmatized", tokens_lm)
         # final_tokens = self._rm_highfreq_tokens(tokens_lm)
         return tokens_lm
 
@@ -102,16 +105,16 @@ class Parser:
             comments = page.comment.contents
         return text + " " + username[0] + " " + comments[0]
 
-    def parse_page(self, pageid):
+    def parse_page(self, pageid, verbose=False):
         page = [p for p in self.pages if int(p.id.contents[0]) == pageid][0]
         doc = Parser._pick_desired_tags(page)
-        return self._prepare_text(doc)
+        return self._prepare_text(doc, verbose)
 
     def get_docids(self):
         return [int(p.id.contents[0]) for p in self.pages]
 
-    def parse_text(self, text):
-        return self._prepare_text(text)
+    def parse_text(self, text, verbose=False):
+        return self._prepare_text(text, verbose=verbose)
 
     def _rm_highfreq_tokens(self, tokens):
         print(list(filter(lambda x: Counter(tokens)[x] >= sum(Counter(tokens).values()) / self.freq_threshould,
