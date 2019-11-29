@@ -57,13 +57,15 @@ class VectorSpace:
 def create_vector_space():
     indexer = Indexer(MODE)
     index_table = indexer.read_index_table()
+    print(index_table)
+    # exit(1)
     vs = VectorSpace(index_table, len(indexer.parser.get_docids()))
     i = 1
     print(len(index_table))
     # exit(0)
     for id in indexer.parser.get_docids():
         print(id, ':', i, '/', len(indexer.parser.get_docids()))
-        words = indexer.index_single_doc(id).keys()
+        words = set(indexer.index_single_doc(id).keys())
         vs.add_doc_vec(id, words)
         i += 1
     vs.write_vec_to_file()
@@ -71,4 +73,5 @@ def create_vector_space():
 
 
 if __name__ == '__main__':
-    create_vector_space()
+    # create_vector_space()
+    VectorSpace.read_vector_space_model(MODE)
