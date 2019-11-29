@@ -44,6 +44,12 @@ class VectorSpace:
         return self._normalize(vec)
 
     @staticmethod
+    def read_vector_space_model(mode):
+        filename = "DataSet/vector_spaces/" + mode + "_vector_space"
+        with open(filename, "r", encoding="utf8") as f:
+            return eval(f.read())
+
+    @staticmethod
     def _normalize(vec: np.array):
         return vec / scipy.sparse.linalg.norm(vec)
 

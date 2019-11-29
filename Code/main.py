@@ -69,6 +69,10 @@ if __name__ == '__main__':
         else:
             invalid()
     # FIXME stub
+    indexer = Indexer(mode)
+    index_table = indexer.read_index_table()
+    bigram_table = indexer.read_bigram()
+    vector_space_model = VectorSpace.read_vector_space_model(mode)
     query_corrector = QueryCorrector(list())
     searcher = Searcher(query_corrector, {}, None, None)
     while True:
