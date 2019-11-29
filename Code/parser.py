@@ -12,6 +12,7 @@ class Parser:
     """
 
     def __init__(self, freq_threshold, common_words_filename):
+        self.common_words_filename = common_words_filename
         self.common_words = self._read_common_words(common_words_filename)
         self.documents = []
         self.freq_threshold = freq_threshold
@@ -66,7 +67,8 @@ class Parser:
             print("Lemmatized", tokens_lm)
         return tokens_lm
 
-    def extract_common_words(self, filename):
+    def extract_common_words(self):
+        filename = self.common_words_filename
         comp_text = " ".join(self._prepare_complete_text(doc) for doc in self.documents)
         term_array = self._prepare_text(comp_text, verbose=False)
         candidates = Counter(term_array).most_common(86)
@@ -198,7 +200,7 @@ if __name__ == '__main__':
     # for pp in p.get_docids():
     #     print(pp, end=" ")
     #     (p.parse_page(pp))
-    p.extract_common_words("DataSet/common_words/persian_common_words")
+    p.extract_common_words()
     # p = EnglishParser("DataSet/English.csv")
     # p.extract_common_words("DataSet/common_words/english_common_words")
     # for id in p.get_docids():

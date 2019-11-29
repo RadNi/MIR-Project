@@ -14,6 +14,43 @@ def invalid():
     print_line()
 
 
+def pre_process_text(mode):
+
+    if mode == 'persian':
+        p = PersianParser()
+    elif mode == 'english':
+        p = EnglishParser()
+
+    selection = input("""
+    Which part do you want to test?
+    \t1. Parse
+    \t2. Extract common words
+    """)
+
+    if selection == 1:
+        doc_id = input("""
+        Choose your document id to parse
+        """)
+        print(p.parse_doc(doc_id))
+    elif selection == 2:
+        p.extract_common_words()
+
+
+def create_index_tables(mode):
+    indexer = Indexer(mode)
+
+    selection = input("""
+    Which table do you want to create?
+    \t1. Index table
+    \t2. bi-gram table
+    """)
+
+    if selection == 1:
+        indexer.index()
+    elif selection == 2:
+        indexer.create_bigram_index()
+
+
 if __name__ == '__main__':
     mode = "persian"
     while True:
@@ -49,11 +86,11 @@ if __name__ == '__main__':
             exit(0)
         elif selection == 1:
             # Pre-processing scenarios
-            pass
+
+            pre_process_text(mode)
 
         elif selection == 2:
-            # Indexing scenarios
-            pass
+            create_index_tables(mode)
 
         elif selection == 3:
             # Query correction scenarios
