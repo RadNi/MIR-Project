@@ -56,15 +56,15 @@ class Parser:
             input(self._pick_desired_tags(p))
         # sum_str = " ".join()
 
-    def must_delete(self, term):
-        return self._is_delimiter(term) or (term in self.common_words)
+    # def must_delete(self, term):
+    #     return self._is_delimiter(term) or (term in self.common_words)
 
     def _rm_delimiters(self, document):
         res = list(document)
         for i in range(len(document)):
             if Parser._is_delimiter(document[i]):
                 res[i] = " "
-        return res
+        return "".join(c for c in res)
 
     def _normalize_doc(self, doc):
         return self.normalizer.normalize("".join(doc))
@@ -79,9 +79,11 @@ class Parser:
 
         return res
 
-    def _prepare_text(self, text, remove_del=True, verbose=False):
+    def _prepare_text(self, text, remove_del=False, verbose=False, only_tokenize=False):
         if remove_del:
             text = self._rm_delimiters(text)
+        if only_tokenize:
+            return self._tokenize(text)
         doc_nr = self._normalize_doc(text)
         if verbose:
             print("Normalized", doc_nr)
@@ -105,16 +107,16 @@ class Parser:
             comments = page.comment.contents
         return text + " " + username[0] + " " + comments[0]
 
-    def parse_page(self, pageid, verbose=False):
+    def parse_page(self, pageid, verbose=False, only_tokenize=False, remove_del=False):
         page = [p for p in self.pages if int(p.id.contents[0]) == pageid][0]
         doc = Parser._pick_desired_tags(page)
-        return self._prepare_text(doc, verbose)
+        return self._prepare_text(text=doc, verbose=verbose, only_tokenize=only_tokenize, remove_del=remove_del)
 
     def get_docids(self):
         return [int(p.id.contents[0]) for p in self.pages]
 
-    def parse_text(self, text, verbose=False):
-        return self._prepare_text(text, verbose=verbose)
+    def parse_text(self, text, verbose=False, remove_del=False, only_tokenize=False):
+        return self._prepare_text(text, verbose=verbose, remove_del=remove_del, only_tokenize=only_tokenize)
 
     def _rm_highfreq_tokens(self, tokens):
         print(list(filter(lambda x: Counter(tokens)[x] >= sum(Counter(tokens).values()) / self.freq_threshould,
@@ -131,6 +133,14 @@ class Parser:
     #         if not self._is_delimiter(c):
     #             new_elem += c
     #     return new_elem
+    def remove_commons_and_delimiters(self, elem):
+        res = ''
+        for c in elem:
+            if c not in Parser.Delimiters:
+                res += c
+        if res not in self.common_words:
+            return res
+        return None
 
 
 if __name__ == '__main__':
