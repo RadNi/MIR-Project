@@ -38,7 +38,7 @@ class Parser:
         return self.normalizer("".join(doc))
 
     def _tokenize(self, doc):
-        return word_tokenize(doc)
+        return self.word_tokenize(doc)
 
     def _lemmatize_tokens(self, tokens):
         res = []
@@ -110,8 +110,11 @@ class EnglishParser(Parser):
         super().__init__(freq_threshold=100, common_words_filename=common_words_filename)
 
         nltk.download('wordnet')
+        nltk.download('punkt')
+
         self.normalizer = str.lower
         self.lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
+        self.word_tokenize = nltk.tokenize.word_tokenize
 
         self.documents = self.read_english_documents("DataSet/corpus/English.csv")
 
@@ -186,6 +189,7 @@ class PersianParser(Parser):
 
         self.normalizer = Normalizer().normalize
         self.lemmatizer = Lemmatizer().lemmatize
+        self.word_tokenize = word_tokenize
 
         handler = open("DataSet/corpus/Persian.xml", encoding="utf8").read()
         self.bs = BeautifulSoup(handler, features="lxml")
@@ -257,6 +261,7 @@ class PersianParser(Parser):
 
 if __name__ == '__main__':
     p = PersianParser()
+    # p = EnglishParser()
     # print(p.parse_page(p.get_docids()[-1]))
     # print(p.parse_text(input()))
     # for pp in p.get_docids():
