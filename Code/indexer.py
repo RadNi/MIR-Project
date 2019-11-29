@@ -1,5 +1,4 @@
 from Code.parser import *
-from hazm import *
 
 
 class Indexer:
@@ -11,7 +10,7 @@ class Indexer:
 
     def __init__(self, filename):
         self.filename = filename
-        self.parser = Parser(filename)
+        self.parser = PersianParser(filename)
         self.persian_posting_list = dict()
         self.persian_bigram_index = {}
 
@@ -22,9 +21,12 @@ class Indexer:
             print(id, ":", i, "/", len(docids))
             i += 1
             ind = self.parser.parse_page(id)
+            # print(ind)
             table = self.get_duplicates_with_info(ind)
             self.merge_index(table, id)
-        self._write_index_to_file()
+            # print(self.persian_posting_list)
+            # input(self.persian_posting_list)
+        # self._write_index_to_file()
 
     # def index_doc(self, docId):
     #     tokens = self.parser.parse_page(docId)
@@ -51,9 +53,11 @@ class Indexer:
     def merge_index(self, table, id):
         for term in table:
             if term in self.persian_posting_list:
-                self.persian_posting_list[term].append({id: table[term]})
+                self.persian_posting_list[term][id] = table[term]
+                print(term)
+                input(self.persian_posting_list)
             else:
-                self.persian_posting_list[term] = [{id: table[term]}]
+                self.persian_posting_list[term] = {id: table[term]}
 
     def get_duplicates_with_info(self, list_of_elems):
         ''' Get duplicate element in a list along with their indices in list
@@ -80,7 +84,7 @@ class Indexer:
         return dict_of_elems
 
     def _write_index_to_file(self):
-        with open("persian_index", "w") as f:
+        with open("persian_indexـ۲", "w") as f:
             f.write(str(self.persian_posting_list))
 
     def read_persian_index(self):
@@ -112,8 +116,7 @@ class Indexer:
                 self.persian_bigram_index[bigram] = [term]
 
     def _write_persian_bigram_to_file(self):
-
-        with open("persian_bigram", "w") as f:
+        with open("persian_bigram_2", "w") as f:
             f.write(str(self.persian_bigram_index))
 
     def read_persian_bigram(self):
@@ -123,7 +126,8 @@ class Indexer:
 
 if __name__ == '__main__':
     ind = Indexer("DataSet/Persian.xml")
+    ind.index_persian()
     # ind.create_persian_bigram_index()
     # ind.index_persian()
-    ind.read_persian_bigram()
+    # ind.read_persian_bigram()
     # print(ind.index_doc(ind.get_docids()[-1]))
