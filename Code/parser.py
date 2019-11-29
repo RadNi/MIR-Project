@@ -75,7 +75,7 @@ class Parser:
             if v >= self.freq_threshold:
                 temp.append(k)
 
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding="utf8") as f:
             f.write(str(temp))
 
     def parse_doc(self, docid, only_tokenize=False, remove_del=False, verbose=False):
@@ -125,7 +125,7 @@ class EnglishParser(Parser):
 
     def read_english_documents(self, filename):
         documents = []
-        with open(filename) as csv_file:
+        with open(filename, encoding="utf8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
@@ -156,7 +156,7 @@ class PersianParser(Parser):
         self.normalizer = Normalizer().normalize
         self.lemmatizer = Lemmatizer().lemmatize
 
-        handler = open("DataSet/corpus/Persian.xml").read()
+        handler = open("DataSet/corpus/Persian.xml", encoding="utf8").read()
         self.bs = BeautifulSoup(handler, features="lxml")
         self.pages = self.bs.find_all("page")
         self.documents = self.pages

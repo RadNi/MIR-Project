@@ -4,6 +4,7 @@ from Code.parser import *
 from Code.constants import *
 import scipy.sparse
 import scipy.sparse.linalg
+import math
 
 
 class VectorSpace:
@@ -15,19 +16,23 @@ class VectorSpace:
         self.doc_dict = {}
         self.word_count = len(self.word2index)
 
-    def add_doc_vec(self, doc_id, doc_word_set):
+    def add_doc_vec(self, doc_id, word_set):
+        self.doc_dict[doc_id] = word_set
+
+    def get_doc_vec(self, doc_id):
         new_vec = scipy.sparse.lil_matrix((self.word_count, 1))
-        for word in doc_word_set:
+        word_list = self.doc_dict[doc_id]
+        for word in word_list:
             posting: dict = self.postings[word]
-            idf = np.log2((self.doc_count + 1) / len(posting.keys()))
-            tf = 1 + np.log2(len(posting[doc_id]))
+            idf = math.log2((self.doc_count + 1) / len(posting.keys()))
+            tf = 1 + math.log2(len(posting[doc_id]))
             new_vec[self.word2index.index(word), 0] = tf * idf
-        self.doc_dict[doc_id] = self._normalize(new_vec)
+        return new_vec
 
     def write_vec_to_file(self, filename):
-        # np.save(filename, self.doc_dict)
-        with open(filename, 'w') as f:
-            f.write(str(self.doc_dict))
+        scipy.sparse.save_npz(filename, self.doc_dict)
+        # with open(filename, 'w') as f:
+        #     f.write(str(self.doc_dict))
 
     def calculate_query_vec(self, query_words_list: list):
         vec = scipy.sparse.lil_matrix((self.word_count, 1))
@@ -35,7 +40,7 @@ class VectorSpace:
         for word in words_set:
             count = query_words_list.count(word)
             idf = 1
-            tf = 1 + np.log2(count)
+            tf = 1 + math.log2(count)
             vec[self.word2index.index(word), 0] = tf * idf
         return self._normalize(vec)
 
