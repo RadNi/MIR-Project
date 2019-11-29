@@ -24,7 +24,7 @@ class Indexer:
             ind = self.parser.parse_page(id)
             table = self.get_duplicates_with_info(ind)
             self.merge_index(table, id)
-        self.write_index_to_file()
+        self._write_index_to_file()
 
     # def index_doc(self, docId):
     #     tokens = self.parser.parse_page(docId)
@@ -79,7 +79,7 @@ class Indexer:
         dict_of_elems = {key: value for key, value in dict_of_elems.items()}
         return dict_of_elems
 
-    def write_index_to_file(self):
+    def _write_index_to_file(self):
         with open("persian_index", "w") as f:
             f.write(str(self.persian_posting_list))
 
@@ -116,10 +116,14 @@ class Indexer:
         with open("persian_bigram", "w") as f:
             f.write(str(self.persian_bigram_index))
 
+    def read_persian_bigram(self):
+        with open("persian_bigram", "r") as f:
+            return f.read()
+
 
 if __name__ == '__main__':
     ind = Indexer("DataSet/Persian.xml")
-    ind.create_persian_bigram_index()
+    # ind.create_persian_bigram_index()
     # ind.index_persian()
-    # ind.read_persian_index()
+    ind.read_persian_bigram()
     # print(ind.index_doc(ind.get_docids()[-1]))
