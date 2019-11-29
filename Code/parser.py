@@ -118,37 +118,6 @@ class EnglishParser(Parser):
 
         self.documents = self.read_english_documents("DataSet/corpus/English.csv")
 
-    @staticmethod
-    def _is_english(ch):
-        return super()._is_english(ch)
-
-    def _rm_delimiters(self, document):
-        return super()._rm_delimiters(document)
-
-    def _normalize_doc(self, doc):
-        return super()._normalize_doc(doc)
-
-    def _tokenize(self, doc):
-        return super()._tokenize(doc)
-
-    def _lemmatize_tokens(self, tokens):
-        return super()._lemmatize_tokens(tokens)
-
-    def _read_common_words(self, filename):
-        return super()._read_common_words(filename)
-
-    def _prepare_text(self, text, remove_del=False, verbose=False, only_tokenize=False):
-        return super()._prepare_text(text, remove_del, verbose, only_tokenize)
-
-    def extract_common_words(self):
-        super().extract_common_words()
-
-    def parse_text(self, text, verbose=False, remove_del=False, only_tokenize=False):
-        return super().parse_text(text, verbose, remove_del, only_tokenize)
-
-    def _remove_commons_and_delimiters(self, elem, delimiters):
-        return super()._remove_commons_and_delimiters(elem, delimiters)
-
     def _prepare_complete_text(self, doc):
         return doc
 
@@ -195,37 +164,6 @@ class PersianParser(Parser):
         self.bs = BeautifulSoup(handler, features="lxml")
         self.pages = self.bs.find_all("page")
         self.documents = self.pages
-
-    @staticmethod
-    def _is_english(ch):
-        return super()._is_english(ch)
-
-    def _rm_delimiters(self, document):
-        return super()._rm_delimiters(document)
-
-    def _normalize_doc(self, doc):
-        return super()._normalize_doc(doc)
-
-    def _tokenize(self, doc):
-        return super()._tokenize(doc)
-
-    def _lemmatize_tokens(self, tokens):
-        return super()._lemmatize_tokens(tokens)
-
-    def _read_common_words(self, filename):
-        return super()._read_common_words(filename)
-
-    def _prepare_text(self, text, remove_del=False, verbose=False, only_tokenize=False):
-        return super()._prepare_text(text, remove_del, verbose, only_tokenize)
-
-    def extract_common_words(self):
-        super().extract_common_words()
-
-    def parse_text(self, text, verbose=False, remove_del=False, only_tokenize=False):
-        return super().parse_text(text, verbose, remove_del, only_tokenize)
-
-    def _remove_commons_and_delimiters(self, elem, delimiters):
-        return super()._remove_commons_and_delimiters(elem, delimiters)
 
     @staticmethod
     def _pick_desired_tags(page):
