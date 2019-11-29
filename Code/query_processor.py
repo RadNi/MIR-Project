@@ -1,5 +1,5 @@
 import editdistance
-from Code.constants import MIN_IOU, FARSI
+from Code.constants import MIN_IOU
 import hazm
 import nltk
 
@@ -9,8 +9,8 @@ class QueryCorrector:
         self.index_list: list = bi_gram_index
         # indexes are lists of tuples
 
-    def correct_query(self, query_string: str):
-        if FARSI:
+    def correct_query(self, query_string: str, mode):
+        if mode == "persian":
             correct_words = []
             words = hazm.word_tokenize(query_string)
             for word in words:

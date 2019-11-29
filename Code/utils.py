@@ -1,6 +1,5 @@
 import numpy as np
 from Code.indexer import Indexer
-from Code.parser import *
 from Code.constants import *
 import scipy.sparse
 import scipy.sparse.linalg
@@ -30,9 +29,8 @@ class VectorSpace:
         return new_vec
 
     def write_vec_to_file(self, filename):
-        scipy.sparse.save_npz(filename, self.doc_dict)
-        # with open(filename, 'w') as f:
-        #     f.write(str(self.doc_dict))
+        with open(filename, 'w', encoding="utf8") as f:
+            f.write(str(self.doc_dict))
 
     def calculate_query_vec(self, query_words_list: list):
         vec = scipy.sparse.lil_matrix((self.word_count, 1))
