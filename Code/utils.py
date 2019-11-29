@@ -25,9 +25,9 @@ class VectorSpace:
         self.doc_dict[doc_id] = self._normalize(new_vec)
 
     def write_vec_to_file(self, filename):
-        np.save(filename, self.doc_dict)
-        # with open(filename, 'w') as f:
-        #     f.write(str(self.doc_dict))
+        # np.save(filename, self.doc_dict)
+        with open(filename, 'w') as f:
+            f.write(str(self.doc_dict))
 
     def calculate_query_vec(self, query_words_list: list):
         vec = scipy.sparse.lil_matrix((self.word_count, 1))

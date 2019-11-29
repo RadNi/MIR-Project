@@ -11,44 +11,17 @@ class Parser:
     Shall we ignore nim-fasele?
     What's the policy?
     """
+    def __init__(self, freq_threshold, common_words_filename):
+        self.common_words = self._read_common_words(common_words_filename)
+        self.documents = []
+        self.freq_threshold = freq_threshold
 
     @staticmethod
     def _is_english(ch):
         return 'A' <= ch <= 'Z' or 'a' <= ch <= 'z' or '0' <= ch <= '9'
 
-    def __init__(self, freq_threshould, common_words_filename):
-        # self.freq_threshould = 40
-        self.common_words = self._read_common_words(common_words_filename)
-        # print(self.common_words)
-        self.documents = []
-        self.freq_threshould = freq_threshould
-
     def _prepare_complete_text(self, doc):
         pass
-
-    def extract_common_words(self, filename):
-        # for doc in self.documents:
-        #     print(self._prepare_complete_text(doc))
-        comp_text = " ".join(self._prepare_complete_text(doc) for doc in self.documents)
-        # print(comp_text)
-        term_array = self._prepare_text(comp_text, verbose=False)
-        # print(term_array)
-        candidates = Counter(term_array).most_common(86)
-        temp = []
-        for k, v in candidates:
-            if v >= self.freq_threshould:
-                temp.append(k)
-
-        with open(filename, "w") as f:
-            f.write(str(temp))
-
-    # def _find_highfreq_terms(self):
-    #     for p in self.pages:
-    #         input(self._pick_desired_tags(p))
-        # sum_str = " ".join()
-
-    # def must_delete(self, term):
-    #     return self._is_delimiter(term) or (term in self.common_words)
 
     def _rm_delimiters(self, document):
         res = list(document)
@@ -73,6 +46,10 @@ class Parser:
 
         return res
 
+    def _read_common_words(self, filename):
+        with open(filename, 'r') as f:
+            return eval(f.read())
+
     def _prepare_text(self, text, remove_del=False, verbose=False, only_tokenize=False):
         if remove_del:
             text = self._rm_delimiters(text)
@@ -87,8 +64,19 @@ class Parser:
         tokens_lm = self._lemmatize_tokens(tokens)
         if verbose:
             print("Lemmatized", tokens_lm)
-        # final_tokens = self._rm_highfreq_tokens(tokens_lm)
         return tokens_lm
+
+    def extract_common_words(self, filename):
+        comp_text = " ".join(self._prepare_complete_text(doc) for doc in self.documents)
+        term_array = self._prepare_text(comp_text, verbose=False)
+        candidates = Counter(term_array).most_common(86)
+        temp = []
+        for k, v in candidates:
+            if v >= self.freq_threshold:
+                temp.append(k)
+
+        with open(filename, "w") as f:
+            f.write(str(temp))
 
     def parse_doc(self, docid, only_tokenize=False, remove_del=False, verbose=False):
         pass
@@ -98,22 +86,9 @@ class Parser:
 
     def parse_text(self, text, verbose=False, remove_del=False, only_tokenize=False):
         return self._prepare_text(text, verbose=verbose, remove_del=remove_del, only_tokenize=only_tokenize)
-    #
-    # def _rm_highfreq_tokens(self, tokens):
-    #     print(list(filter(lambda x: Counter(tokens)[x] >= sum(Counter(tokens).values()) / self.freq_threshould,
-    #                  Counter(tokens).keys())))
 
-    def _read_common_words(self, filename):
-        with open(filename, 'r') as f:
-            return eval(f.read())
-
-    # def purify(self, elem):
-    #     return elem
-    #     new_elem = ''
-    #     for c in elem:
-    #         if not self._is_delimiter(c):
-    #             new_elem += c
-    #     return new_elem
+    def remove_commons_and_delimiters(self, elem):
+        pass
 
     def _remove_commons_and_delimiters(self, elem, delimiters):
         res = ''
@@ -124,27 +99,26 @@ class Parser:
             return res
         return None
 
-    def remove_commons_and_delimiters(self, elem):
-        pass
-
 
 class EnglishParser(Parser):
 
     Delimiters = [';', '#', ')', '(', '.', ':', '/', '?']
 
     def __init__(self):
-        common_words_filename = "english_common_words"
-        super().__init__(freq_threshould=100, common_words_filename=common_words_filename)
+        common_words_filename = "DataSet/common_words/english_common_words"
+        super().__init__(freq_threshold=100, common_words_filename=common_words_filename)
 
         nltk.download('wordnet')
         self.normalizer = str.lower
         self.lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
-        # print(self.lemmatizer("Hello"))
 
-        self.documents = self.read_english_documents("DataSet/English.csv")
+        self.documents = self.read_english_documents("DataSet/corpus/English.csv")
 
     def _prepare_complete_text(self, doc):
         return doc
+
+    def _is_delimiter(self, ch):
+        return ch in EnglishParser.Delimiters
 
     def remove_commons_and_delimiters(self, elem):
         return self._remove_commons_and_delimiters(elem, EnglishParser.Delimiters)
@@ -167,9 +141,6 @@ class EnglishParser(Parser):
     def parse_doc(self, docid, only_tokenize=False, remove_del=False, verbose=False):
         return self._prepare_text(self.documents[docid])
 
-    def _is_delimiter(self, ch):
-        return ch in EnglishParser.Delimiters
-
 
 class PersianParser(Parser):
 
@@ -178,26 +149,17 @@ class PersianParser(Parser):
         "|", ",", " ", ":", "=", "(", ")",
         "*", "-", "/", "#", "<", ">", "~", "_", "،", "٫", "«", "»", "؟", "'", "۰"]
 
-    def _prepare_complete_text(self, doc):
-        return self._pick_desired_tags(doc)
-
-    def remove_commons_and_delimiters(self, elem):
-        return self._remove_commons_and_delimiters(elem, PersianParser.Delimiters)
-
     def __init__(self):
-        common_words_filename = "persian_common_words"
-        super().__init__(freq_threshould=2500, common_words_filename=common_words_filename)
+        common_words_filename = "DataSet/common_words/persian_common_words"
+        super().__init__(freq_threshold=2500, common_words_filename=common_words_filename)
 
         self.normalizer = Normalizer().normalize
         self.lemmatizer = Lemmatizer().lemmatize
 
-        handler = open("DataSet/Persian.xml").read()
+        handler = open("DataSet/corpus/Persian.xml").read()
         self.bs = BeautifulSoup(handler, features="lxml")
         self.pages = self.bs.find_all("page")
         self.documents = self.pages
-
-    def _is_delimiter(self, ch):
-        return ch in PersianParser.Delimiters or Parser._is_english(ch)
 
     @staticmethod
     def _pick_desired_tags(page):
@@ -210,6 +172,12 @@ class PersianParser(Parser):
             comments = page.comment.contents
         return text + " " + username[0] + " " + comments[0]
 
+    def _is_delimiter(self, ch):
+        return ch in PersianParser.Delimiters or Parser._is_english(ch)
+
+    def _prepare_complete_text(self, doc):
+        return self._pick_desired_tags(doc)
+
     def parse_doc(self, docid, only_tokenize=False, remove_del=False, verbose=False):
         return self.parse_page(docid, verbose=False, only_tokenize=False, remove_del=False)
 
@@ -221,16 +189,19 @@ class PersianParser(Parser):
     def get_docids(self):
         return [int(p.id.contents[0]) for p in self.pages]
 
+    def remove_commons_and_delimiters(self, elem):
+        return self._remove_commons_and_delimiters(elem, PersianParser.Delimiters)
+
 
 if __name__ == '__main__':
-    p = PersianParser("DataSet/Persian.xml")
+    p = PersianParser()
     # print(p.parse_page(p.get_docids()[-1]))
     # print(p.parse_text(input()))
     # for pp in p.get_docids():
     #     print(pp, end=" ")
     #     (p.parse_page(pp))
-    p.extract_common_words("persian_common_words")
+    p.extract_common_words("DataSet/common_words/persian_common_words")
     # p = EnglishParser("DataSet/English.csv")
-    # p.extract_common_words("english_common_words")
+    # p.extract_common_words("DataSet/common_words/english_common_words")
     # for id in p.get_docids():
     #     print(p.parse_doc(id))
