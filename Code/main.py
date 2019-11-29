@@ -33,7 +33,7 @@ def pre_process_text(mode):
         """)
         print(p.parse_doc(doc_id))
     elif selection == 2:
-        p.extract_common_words("DataSet/common_words/" + mode + "_common_words")
+        p.extract_common_words()
 
 
 def create_index_tables(mode):
