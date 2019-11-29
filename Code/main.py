@@ -31,7 +31,9 @@ if __name__ == '__main__':
             break
         else:
             invalid()
-
+    # FIXME stub
+    query_corrector = QueryCorrector(list())
+    searcher = Searcher(query_corrector, {}, None, None)
     while True:
         selection = input("""
         Which part do you want to test?
@@ -70,16 +72,53 @@ if __name__ == '__main__':
                     query = input(f"""
                     Enter your query, language is {mode}:
                     """)
+                    print(query_corrector.correct_query(query, mode))
+                    print_line()
                 else:
                     invalid()
 
         elif selection == 4:
             # Search scenarios
-            pass
+            while True:
+                selection2 = input("""
+                Select what you want to do:
+                \t1. Normal Search
+                \t2. Proximity Search
+                
+                \t0. Back
+                """)
+                if selection2 == 0:
+                    print_line()
+                    break
+                elif selection2 == 1:
+                    query = input(f"""
+                    Enter your query, language is {mode}:
+                    """)
+                    print(f"Output is:\n {searcher.search(query)}")
+                    print_line()
+                elif selection2 == 2:
+                    query = input(f"""
+                    Enter your query, language is {mode}:
+                    """)
+                    proximity_range = 0
+                    while True:
+                        proximity_range_str = input("""
+                        Enter proximity window size:
+                        """)
+                        try:
+                            proximity_range = int(proximity_range_str)
+                            if proximity_range <= 0:
+                                print("Enter an integer bigger than 0:")
+                                continue
+                            print(f"Output is: \n{searcher.proximity_search(query, proximity_range)}")
+                            print_line()
+                            break
+                        except ValueError:
+                            print("Enter an integer bigger than 0:")
+                            continue
+
+                else:
+                    invalid()
 
         else:
             invalid()
-
-
-
-
