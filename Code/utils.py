@@ -60,8 +60,7 @@ class VectorSpace:
 
 
 def create_vector_space():
-    mode = "english"
-    indexer = Indexer(mode)
+    indexer = Indexer(MODE)
     index_table = indexer.read_index_table()
     print(index_table)
     # exit(1)
@@ -74,10 +73,10 @@ def create_vector_space():
         words = set(indexer.index_single_doc(id).keys())
         vs.add_doc_vec(id, words)
         i += 1
-    vs.write_vec_to_file(mode)
+    vs.write_vec_to_file(MODE)
     print(vs.doc_dict)
 
 
 if __name__ == '__main__':
-    # create_vector_space()
+    create_vector_space()
     VectorSpace.read_vector_space_model(MODE)
