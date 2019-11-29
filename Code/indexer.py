@@ -52,11 +52,6 @@ class Indexer:
         with open(self.index_filename, "w", encoding="utf8") as f:
             f.write(str(self.posting_list))
 
-    def read_index_table(self):
-        print("Reading index table ...")
-        with open(self.index_filename, "r", encoding="utf8") as f:
-            return eval(f.read())
-
     def _create_all_terms(self, page_id):
         all_terms = set()
         ind = self.parser.parse_doc(page_id, only_tokenize=True, remove_del=True, verbose=False)
@@ -82,7 +77,7 @@ class Indexer:
 
     def read_index_table(self):
         print("Reading index table ...")
-        with open(self.index_filename, "r") as f:
+        with open(self.index_filename, "r", encoding="utf8") as f:
             return eval(f.read())
 
     def read_bigram(self):

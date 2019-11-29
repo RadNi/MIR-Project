@@ -28,7 +28,8 @@ class VectorSpace:
             new_vec[self.word2index.index(word), 0] = tf * idf
         return self._normalize(new_vec)
 
-    def write_vec_to_file(self, filename):
+    def write_vec_to_file(self):
+        filename = "DataSet/vector_spaces/" + str(MODE) + "_vector_space"
         with open(filename, 'w', encoding="utf8") as f:
             f.write(str(self.doc_dict))
 
@@ -47,17 +48,21 @@ class VectorSpace:
         return vec / scipy.sparse.linalg.norm(vec)
 
 
-if __name__ == '__main__':
+def create_vector_space():
     indexer = Indexer(MODE)
     index_table = indexer.read_index_table()
     vs = VectorSpace(index_table, len(indexer.parser.get_docids()))
     i = 1
     print(len(index_table))
     # exit(0)
-    for id in indexer.parser.get_docids()[:10]:
+    for id in indexer.parser.get_docids():
         print(id, ':', i, '/', len(indexer.parser.get_docids()))
         words = indexer.index_single_doc(id).keys()
         vs.add_doc_vec(id, words)
         i += 1
-    vs.write_vec_to_file(str(MODE) + "_vector_space")
+    vs.write_vec_to_file()
     print(vs.doc_dict)
+
+
+if __name__ == '__main__':
+    create_vector_space()
