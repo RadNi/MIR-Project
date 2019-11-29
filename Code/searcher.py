@@ -59,7 +59,7 @@ class Searcher:
                 window_okay = True
                 for word in set(normalized_query):
                     position_array = np.array(self.postings_index.get(word).get(doc))
-                    if not np.any(window_start <= position_array < (window_start + window_size)):
+                    if not np.any((window_start <= position_array) & (position_array < (window_start + window_size))):
                         window_okay = False
                         break
                 if window_okay:

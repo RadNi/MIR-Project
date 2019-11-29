@@ -143,7 +143,7 @@ class EnglishParser(Parser):
         return [i for i in range(len(self.documents))]
 
     def parse_doc(self, docid, only_tokenize=False, remove_del=False, verbose=False):
-        return self._prepare_text(self.documents[docid])
+        return self._prepare_text(self.documents[docid], only_tokenize=only_tokenize, remove_del=remove_del, verbose=verbose)
 
 
 class PersianParser(Parser):

@@ -150,17 +150,18 @@ Enter your query, language is {mode}:
                         proximity_range_str = input("""
 Enter proximity window size:
 """)
-                        try:
-                            proximity_range = int(proximity_range_str)
-                            if proximity_range <= 0:
-                                print("Enter an integer bigger than 0:")
-                                continue
-                            print(f"Output is: \n{searcher.proximity_search(query, proximity_range, mode)}")
-                            print_line()
-                            break
-                        except ValueError:
+                        # try:
+                        proximity_range = int(proximity_range_str)
+                        if proximity_range <= 0:
+                            print(proximity_range)
                             print("Enter an integer bigger than 0:")
                             continue
+                        print(f"Output is: \n{searcher.proximity_search(query, proximity_range, mode)}")
+                        print_line()
+                        break
+                        # except ValueError:
+                        #     print("Enter an integer bigger than 0:")
+                        #     continue
 
                 else:
                     invalid()
