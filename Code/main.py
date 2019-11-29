@@ -72,7 +72,7 @@ if __name__ == '__main__':
                     query = input(f"""
                     Enter your query, language is {mode}:
                     """)
-                    print(query_corrector.correct_query(query, mode))
+                    print(f"Output is: \n{query_corrector.correct_query(query, mode)}")
                     print_line()
                 else:
                     invalid()
