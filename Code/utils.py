@@ -21,7 +21,7 @@ class VectorSpace:
             posting: dict = self.postings[word]
             idf = np.log2((self.doc_count + 1) / len(posting.keys()))
             tf = 1 + np.log2(len(posting[doc_id]))
-            new_vec[0, self.word2index.index(word)] = tf * idf
+            new_vec[self.word2index.index(word), 0] = tf * idf
         self.doc_dict[doc_id] = self._normalize(new_vec)
 
     def write_vec_to_file(self, filename):
@@ -36,7 +36,7 @@ class VectorSpace:
             count = query_words_list.count(word)
             idf = 1
             tf = 1 + np.log2(count)
-            vec[self.word2index.index(word)] = tf * idf
+            vec[self.word2index.index(word), 0] = tf * idf
         return self._normalize(vec)
 
     @staticmethod
