@@ -94,12 +94,12 @@ class Indexer:
         return dict_of_elems
 
     def _write_index_to_file(self):
-        with open(self.index_filename, "w") as f:
+        with open(self.index_filename, "w", encoding="utf8") as f:
             f.write(str(self.posting_list))
 
     def read_index_table(self):
         print("Reading index table ...")
-        with open(self.index_filename, "r") as f:
+        with open(self.index_filename, "r", encoding="utf8") as f:
             return eval(f.read())
 
     def _create_all_terms(self, page_id):
@@ -127,11 +127,11 @@ class Indexer:
                 self.bigram_index[bigram] = [term]
 
     def _write_bigram_to_file(self):
-        with open(self.bigram_index_filename, "w") as f:
+        with open(self.bigram_index_filename, "w", encoding="utf8") as f:
             f.write(str(self.bigram_index))
 
     def read_bigram(self):
-        with open(self.bigram_index_filename, "r") as f:
+        with open(self.bigram_index_filename, "r", encoding="utf8") as f:
             return eval(f.read())
 
 
