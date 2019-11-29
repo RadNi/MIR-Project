@@ -26,7 +26,7 @@ class VectorSpace:
             idf = math.log2((self.doc_count + 1) / len(posting.keys()))
             tf = 1 + math.log2(len(posting[doc_id]))
             new_vec[self.word2index.index(word), 0] = tf * idf
-        return new_vec
+        return self._normalize(new_vec)
 
     def write_vec_to_file(self, filename):
         with open(filename, 'w', encoding="utf8") as f:
