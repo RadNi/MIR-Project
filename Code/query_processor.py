@@ -23,8 +23,8 @@ class QueryCorrector:
                 correct_words.append(self.correct_word(word))
             return " ".join(correct_words)
 
-    def correct_word(self, word: str):
-        grams: set = self.extract_bi_grams(word)
+    def correct_word(self, the_word: str):
+        grams: set = self.extract_bi_grams(the_word)
         word_set = set()
         for gram in grams:
             word_set.update(set(self.grad_dict[gram]))
@@ -34,7 +34,7 @@ class QueryCorrector:
             word_grams = self.extract_bi_grams(word)
             if self.calculate_iou(grams, word_grams) > MIN_IOU:
                 final_set.append(word)
-        final_set.sort(key=lambda x: editdistance.distance(x, word))
+        final_set.sort(key=lambda x: editdistance.distance(x, the_word))
         return final_set[0]
 
     @staticmethod

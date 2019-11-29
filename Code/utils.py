@@ -16,7 +16,7 @@ class VectorSpace:
         self.word_count = len(self.word2index)
 
     def add_doc_vec(self, doc_id, word_set):
-        self.doc_dict[doc_id] = word_set
+        self.doc_dict[doc_id] = set(word_set)
 
     def get_doc_vec(self, doc_id):
         new_vec = scipy.sparse.lil_matrix((self.word_count, 1))
@@ -28,8 +28,8 @@ class VectorSpace:
             new_vec[self.word2index.index(word), 0] = tf * idf
         return self._normalize(new_vec)
 
-    def write_vec_to_file(self):
-        filename = "DataSet/vector_spaces/" + str(MODE) + "_vector_space"
+    def write_vec_to_file(self, mode):
+        filename = "DataSet/vector_spaces/" + mode + "_vector_space"
         with open(filename, 'w', encoding="utf8") as f:
             f.write(str(self.doc_dict))
 
@@ -55,7 +55,8 @@ class VectorSpace:
 
 
 def create_vector_space():
-    indexer = Indexer(MODE)
+    mode = "english"
+    indexer = Indexer(mode)
     index_table = indexer.read_index_table()
     vs = VectorSpace(index_table, len(indexer.parser.get_docids()))
     i = 1
@@ -66,7 +67,7 @@ def create_vector_space():
         words = indexer.index_single_doc(id).keys()
         vs.add_doc_vec(id, words)
         i += 1
-    vs.write_vec_to_file()
+    vs.write_vec_to_file(mode)
     print(vs.doc_dict)
 
 

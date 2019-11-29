@@ -9,7 +9,7 @@ class Searcher:
     # FIXME should get from somewhere
     TOTAL_DOCUMENTS = 1000
 
-    def __init__(self, query_corrector: QueryCorrector, postings_index: dict, parser: Parser,
+    def __init__(self, query_corrector: QueryCorrector, postings_index: dict, parser,
                  vector_space: VectorSpace):
         self.postings_index = postings_index
         self.query_corrector = query_corrector
@@ -17,9 +17,10 @@ class Searcher:
         self.word2index = list(postings_index.keys())
         self.vector_space = vector_space
 
-    def search(self, query):
-        corrected_query = self.query_corrector.correct_query(query)
-        normalized_query = self.parser.parse_text(corrected_query)
+    def search(self, query, mode):
+        corrected_query = self.query_corrector.correct_query(query, mode)
+        print(corrected_query)
+        normalized_query = self.parser.parse_text(text=corrected_query)
         current_posting_list = self.postings_index.get(normalized_query[0])
         # Intersect all doc IDs
         doc_id_set = set([posting.keys() for posting in current_posting_list])
@@ -34,9 +35,9 @@ class Searcher:
             doc_id_list = doc_id_list[:15]
         return doc_id_list
 
-    def proximity_search(self, query, window_size:int):
-        corrected_query = self.query_corrector.correct_query(query)
-        normalized_query = self.parser.parse_text(corrected_query)
+    def proximity_search(self, query, window_size:int, mode):
+        corrected_query = self.query_corrector.correct_query(query, mode)
+        normalized_query = self.parser.parse_text(text=corrected_query)
         current_posting_list = self.postings_index.get(normalized_query[0])
         # Intersect all doc IDs
         doc_id_set = set([posting.keys() for posting in current_posting_list])
