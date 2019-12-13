@@ -103,7 +103,7 @@ class Parser:
 
 
 class EnglishParser(Parser):
-    Delimiters = [';', '#', ')', '(', '.', ':', '/', '?']
+    Delimiters = [';', '#', ')', '(', '.', ':', '/', '?', '\\', ',', '\n', '&']
 
     def __init__(self, preload_corpus=True):
         common_words_filename = "DataSet/common_words/english_common_words"
@@ -141,7 +141,7 @@ class EnglishParser(Parser):
 
     def load_english_documents(self, documents_data, is_data_tagged=True):
         documents = []
-        for i in range(1, len(documents)):
+        for i in range(1, len(documents_data)):
             if is_data_tagged:
                 documents.append(f'{documents_data[i][1]} {documents_data[i][2]}')
             else:

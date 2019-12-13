@@ -1,8 +1,8 @@
+import csv
 import math
 
 import numpy as np
 from Code.parser import EnglishParser
-from Code.indexer import Indexer
 
 
 class Classifier:
@@ -102,6 +102,8 @@ class NaiveBayesClassifier(Classifier):
                 if token in current_index.keys():
                     current_prob += math.log2(
                         (current_index[token] + 1) / (self.class_frequencies[tag] + self.all_words_count))
+                else:
+                    current_prob += math.log2(1 / (self.class_frequencies[tag] + self.all_words_count))
             if current_prob > best_prob:
                 best_prob = current_prob
                 best_tag = tag
@@ -109,7 +111,7 @@ class NaiveBayesClassifier(Classifier):
 
     def _create_class_index(self, train_data):
         for doc_id in range(1, len(train_data)):
-            lemmatized_tokens = self.english_parser.parse_doc(doc_id, remove_del=True)
+            lemmatized_tokens = self.english_parser.parse_doc(doc_id - 1, remove_del=True)
             current_tag = train_data[doc_id][0]
             index_dict = {}
             if current_tag in self.class_index.keys():
@@ -161,3 +163,13 @@ class RandomForestClassifier(Classifier):
 
     def test(self, test_data):
         return super().test(test_data)
+
+
+if __name__ == '__main__':
+    with open("DataSet/training_data/phase2_train.csv") as csv_file:
+        dataset = list(csv.reader(csv_file, delimiter=','))
+    classifier: Classifier = NaiveBayesClassifier()
+    classifier.train(dataset)
+    with open("DataSet/training_data/phase2_test.csv") as csv_file:
+        dataset = list(csv.reader(csv_file, delimiter=','))
+    classifier.test(dataset)
