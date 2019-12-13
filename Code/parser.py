@@ -139,11 +139,21 @@ class EnglishParser(Parser):
             print(f'Processed {line_count} lines.')
         return documents
 
+    def load_english_documents(self, documents_data, is_data_tagged=True):
+        documents = []
+        for i in range(1, len(documents)):
+            if is_data_tagged:
+                documents.append(f'{documents_data[i][1]} {documents_data[i][2]}')
+            else:
+                documents.append(f'{documents_data[i][0]} {documents_data[i][1]}')
+        self.documents = documents
+
     def get_docids(self):
         return [i for i in range(len(self.documents))]
 
     def parse_doc(self, docid, only_tokenize=False, remove_del=False, verbose=False):
-        return self._prepare_text(self.documents[docid], only_tokenize=only_tokenize, remove_del=remove_del, verbose=verbose)
+        return self._prepare_text(self.documents[docid], only_tokenize=only_tokenize, remove_del=remove_del,
+                                  verbose=verbose)
 
 
 class PersianParser(Parser):

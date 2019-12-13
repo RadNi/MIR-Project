@@ -4,15 +4,16 @@ from Code.constants import *
 
 class Indexer:
 
-    def __init__(self, mode):
-        if mode == 'persian':
-            self.parser = PersianParser()
-            self.bigram_index_filename = "DataSet/bigram_tables/persian_bigram"
-            self.index_filename = "DataSet/indexes/persian_index"
-        elif mode == 'english':
-            self.parser = EnglishParser()
-            self.bigram_index_filename = "DataSet/bigram_tables/english_bigram"
-            self.index_filename = "DataSet/indexes/english_index"
+    def __init__(self, mode, generic=False):
+        if not generic:
+            if mode == 'persian':
+                self.parser = PersianParser()
+                self.bigram_index_filename = "DataSet/bigram_tables/persian_bigram"
+                self.index_filename = "DataSet/indexes/persian_index"
+            elif mode == 'english':
+                self.parser = EnglishParser()
+                self.bigram_index_filename = "DataSet/bigram_tables/english_bigram"
+                self.index_filename = "DataSet/indexes/english_index"
         self.posting_list = dict()
         self.bigram_index = {}
 
@@ -99,7 +100,7 @@ class Indexer:
                 self._add_term_to_bigram(term)
         self._write_bigram_to_file()
 
-    def index(self):
+    def index(self, should_write=True):
         docids = self.parser.get_docids()
         i = 1
         for id in docids:
@@ -108,7 +109,8 @@ class Indexer:
             ind = self.parser.parse_doc(id)
             table = self._get_duplicates_with_info(ind)
             self._merge_index(table, id)
-        self._write_index_to_file()
+        if should_write:
+            self._write_index_to_file()
 
 
 if __name__ == '__main__':
