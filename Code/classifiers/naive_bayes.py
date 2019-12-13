@@ -1,50 +1,7 @@
-import csv
 import math
 
-import numpy as np
+from Code.classifiers.classifier import Classifier
 from Code.parser import EnglishParser
-
-
-class Classifier:
-
-    def __init__(self):
-        self.cluster_count = 4
-        self.tags_list = []
-
-    def train(self, train_data):
-        return NotImplementedError
-
-    def test(self, test_data):
-        return NotImplementedError
-
-    def print_information(self, confusion_matrices):
-        for tag in self.tags_list:
-            cm = confusion_matrices[tag]
-            precision = cm[0] / (cm[0] + cm[1])
-            recall = cm[0] / (cm[0] + cm[2])
-            accuracy = (cm[0] + cm[3]) / (sum(cm))
-            f1 = 2 * precision * recall / (precision + recall)
-            print(f"\tFor class {tag}:")
-            print(f"\t\tAccuracy: {accuracy}")
-            print(f"\t\tPrecision: {precision}")
-            print(f"\t\tRecall: {recall}")
-            print(f"\t\tF1: {f1}")
-            print("-------------------------------------------")
-
-
-class KNNClassifier(Classifier):
-
-    def __init__(self, neighbor_num: int, max_iter: int = 100, epsilon: float = 0.001):
-        super().__init__()
-        self.neighbor_num = neighbor_num
-        self.max_iter = max_iter
-        self.epsilon = epsilon
-
-    def train(self, train_data):
-        return super().train(train_data)
-
-    def test(self, test_data):
-        return super().test(test_data)
 
 
 class NaiveBayesClassifier(Classifier):
@@ -139,37 +96,3 @@ class NaiveBayesClassifier(Classifier):
         for class_tag in self.tags_list:
             self.class_probabilities[class_tag] /= len(train_data) - 1
 
-
-class SVMClassifier(Classifier):
-
-    def __init__(self, c: float):
-        super().__init__()
-        self.c = c
-
-    def train(self, train_data):
-        return super().train(train_data)
-
-    def test(self, test_data):
-        return super().test(test_data)
-
-
-class RandomForestClassifier(Classifier):
-
-    def __init__(self):
-        super().__init__()
-
-    def train(self, train_data):
-        return super().train(train_data)
-
-    def test(self, test_data):
-        return super().test(test_data)
-
-
-if __name__ == '__main__':
-    with open("DataSet/training_data/phase2_train.csv") as csv_file:
-        dataset = list(csv.reader(csv_file, delimiter=','))
-    classifier: Classifier = NaiveBayesClassifier()
-    classifier.train(dataset)
-    with open("DataSet/training_data/phase2_test.csv") as csv_file:
-        dataset = list(csv.reader(csv_file, delimiter=','))
-    classifier.test(dataset)
