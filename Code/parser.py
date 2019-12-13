@@ -105,7 +105,7 @@ class Parser:
 class EnglishParser(Parser):
     Delimiters = [';', '#', ')', '(', '.', ':', '/', '?']
 
-    def __init__(self):
+    def __init__(self, preload_corpus=True):
         common_words_filename = "DataSet/common_words/english_common_words"
         super().__init__(freq_threshold=100, common_words_filename=common_words_filename)
 
@@ -115,8 +115,8 @@ class EnglishParser(Parser):
         self.normalizer = str.lower
         self.lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
         self.word_tokenize = nltk.tokenize.word_tokenize
-
-        self.documents = self.read_english_documents("DataSet/corpus/English.csv")
+        if preload_corpus:
+            self.documents = self.read_english_documents("DataSet/corpus/English.csv")
 
     def _prepare_complete_text(self, doc):
         return doc
