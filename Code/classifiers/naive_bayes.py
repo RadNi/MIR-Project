@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 from Code.classifiers.classifier import Classifier
 from Code.parser import EnglishParser
@@ -95,4 +96,3 @@ class NaiveBayesClassifier(Classifier):
             self.class_probabilities[train_data[i][0]] += 1
         for class_tag in self.tags_list:
             self.class_probabilities[class_tag] /= len(train_data) - 1
-
