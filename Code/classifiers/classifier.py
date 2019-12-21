@@ -23,3 +23,27 @@ class Classifier:
             print(f"\t\tRecall: {recall}")
             print(f"\t\tF1: {f1}")
             print("-------------------------------------------")
+
+    def _predict_and_calculate_confusion_matrix(self, predict_dataset):
+        # TP FP FN TN
+        confusion_matrices = {}
+        for tag in self.tags_list:
+            confusion_matrices[tag] = [0, 0, 0, 0]
+        for data in predict_dataset:
+            correct_tag = data[0]
+            predicted_tag = self.predict_single_input(f'{data[1]} {data[2]}')
+            for tag in self.tags_list:
+                if tag == correct_tag:
+                    if tag == predicted_tag:
+                        confusion_matrices[tag][0] += 1
+                    else:
+                        confusion_matrices[tag][2] += 1
+                else:
+                    if tag == predicted_tag:
+                        confusion_matrices[tag][1] += 1
+                    else:
+                        confusion_matrices[tag][3] += 1
+        return confusion_matrices
+
+    def predict_single_input(self, input_str):
+        return NotImplementedError

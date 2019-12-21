@@ -53,9 +53,13 @@ class Indexer:
         dict_of_elems = {key: value for key, value in dict_of_elems.items()}
         return dict_of_elems
 
-    def _write_index_to_file(self):
-        with open(self.index_filename, "w", encoding="utf8") as f:
-            f.write(str(self.posting_list))
+    def _write_index_to_file(self, file_name=None):
+        if file_name is None:
+            with open(self.index_filename, "w", encoding="utf8") as f:
+                f.write(str(self.posting_list))
+        else:
+            with open(file_name, "w", encoding="utf8") as f:
+                f.write(str(self.posting_list))
 
     def create_all_terms(self, page_id):
         all_terms = set()
@@ -80,10 +84,14 @@ class Indexer:
         with open(self.bigram_index_filename, "w", encoding="utf8") as f:
             f.write(str(self.bigram_index))
 
-    def read_index_table(self):
+    def read_index_table(self, index_address=None):
         print("Reading index table ...")
-        with open(self.index_filename, "r", encoding="utf8") as f:
-            return eval(f.read())
+        if index_address is None:
+            with open(self.index_filename, "r", encoding="utf8") as f:
+                return eval(f.read())
+        else:
+            with open(index_address, "r", encoding="utf8") as f:
+                return eval(f.read())
 
     def read_bigram(self):
         with open(self.bigram_index_filename, "r", encoding="utf8") as f:
@@ -104,7 +112,7 @@ class Indexer:
                 self._add_term_to_bigram(term)
         self._write_bigram_to_file()
 
-    def index(self, should_write=True):
+    def index(self, should_write=True, file_name=None):
         docids = self.parser.get_docids()
         i = 1
         for id in docids:
@@ -114,7 +122,7 @@ class Indexer:
             table = self._get_duplicates_with_info(ind)
             self._merge_index(table, id)
         if should_write:
-            self._write_index_to_file()
+            self._write_index_to_file(file_name)
 
 
 if __name__ == '__main__':
