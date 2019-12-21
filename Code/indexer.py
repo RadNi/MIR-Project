@@ -4,18 +4,22 @@ from Code.constants import *
 
 class Indexer:
 
-    def __init__(self, mode, generic=False):
+    def __init__(self, mode, generic=False, preload_corpus=True, is_data_tagged=False):
         if not generic:
             if mode == 'persian':
                 self.parser = PersianParser()
                 self.bigram_index_filename = "DataSet/bigram_tables/persian_bigram"
                 self.index_filename = "DataSet/indexes/persian_index"
             elif mode == 'english':
-                self.parser = EnglishParser()
+                self.parser = EnglishParser(is_data_tagged=is_data_tagged, preload_corpus=preload_corpus)
                 self.bigram_index_filename = "DataSet/bigram_tables/english_bigram"
                 self.index_filename = "DataSet/indexes/english_index"
         self.posting_list = dict()
         self.bigram_index = {}
+
+    def set_adresses(self, index_address, bigram_addres):
+        self.index_filename = index_address
+        self.bigram_index_filename = bigram_addres
 
     def _merge_index(self, table, id):
         for term in table:
@@ -53,7 +57,7 @@ class Indexer:
         with open(self.index_filename, "w", encoding="utf8") as f:
             f.write(str(self.posting_list))
 
-    def _create_all_terms(self, page_id):
+    def create_all_terms(self, page_id):
         all_terms = set()
         ind = self.parser.parse_doc(page_id, only_tokenize=True, remove_del=True, verbose=False)
         for term in ind:

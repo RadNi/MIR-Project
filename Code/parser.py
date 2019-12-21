@@ -105,7 +105,7 @@ class Parser:
 class EnglishParser(Parser):
     Delimiters = [';', '#', ')', '(', '.', ':', '/', '?', '\\', ',', '\n', '&']
 
-    def __init__(self, preload_corpus=True):
+    def __init__(self, preload_corpus=True, is_data_tagged=False):
         common_words_filename = "DataSet/common_words/english_common_words"
         super().__init__(freq_threshold=100, common_words_filename=common_words_filename)
 
@@ -115,6 +115,9 @@ class EnglishParser(Parser):
         self.normalizer = str.lower
         self.lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
         self.word_tokenize = nltk.tokenize.word_tokenize
+        self.is_data_tagged = is_data_tagged
+        if is_data_tagged:
+            self.first_row = []
         if preload_corpus:
             self.documents = self.read_english_documents("DataSet/corpus/English.csv")
 
@@ -127,16 +130,22 @@ class EnglishParser(Parser):
     def remove_commons_and_delimiters(self, elem):
         return self._remove_commons_and_delimiters(elem, EnglishParser.Delimiters)
 
-    def read_english_documents(self, filename):
+    def read_english_documents(self, filename, set_docs=False):
         documents = []
         with open(filename, encoding="utf8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
                 if line_count != 0:
-                    documents.append(f'{row[0]} {row[1]}')
+                    if self.is_data_tagged:
+                        documents.append(f'{row[1]} {row[2]}')
+                        self.first_row.append(row[0])
+                    else:
+                        documents.append(f'{row[0]} {row[1]}')
                 line_count += 1
             print(f'Processed {line_count} lines.')
+        if set_docs:
+            self.documents = documents
         return documents
 
     def load_english_documents(self, documents_data, is_data_tagged=True):

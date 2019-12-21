@@ -34,7 +34,7 @@ class VectorSpace:
         return self._normalize(new_vec)
 
     def write_vec_to_file(self, mode):
-        filename = "DataSet/vector_spaces/" + mode + "_vector_space"
+        filename = "DataSet/vector_spaces/" + mode + "_vector_space_"
         with open(filename, 'w', encoding="utf8") as f:
             f.write(str(self.doc_dict))
 
@@ -50,7 +50,7 @@ class VectorSpace:
 
     @staticmethod
     def read_vector_space_model(mode):
-        filename = "DataSet/vector_spaces/" + mode + "_vector_space"
+        filename = "DataSet/vector_spaces/" + mode + "_vector_space_"
         with open(filename, "r", encoding="utf8") as f:
             return eval(f.read())
 
@@ -64,6 +64,7 @@ def create_vector_space():
     index_table = indexer.read_index_table()
     print(index_table)
     # exit(1)
+    all_words = set()
     vs = VectorSpace(index_table, len(indexer.parser.get_docids()))
     i = 1
     print(len(index_table))
@@ -71,10 +72,14 @@ def create_vector_space():
     for id in indexer.parser.get_docids():
         print(id, ':', i, '/', len(indexer.parser.get_docids()))
         words = set(indexer.index_single_doc(id).keys())
+        for w in words:
+            all_words.add(w)
         vs.add_doc_vec(id, words)
         i += 1
     vs.write_vec_to_file(MODE)
     print(vs.doc_dict)
+    print(all_words)
+    print(len(all_words))
 
 
 if __name__ == '__main__':
