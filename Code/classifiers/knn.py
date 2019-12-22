@@ -1,4 +1,8 @@
-from Code.classifiers.classifier import Classifier
+import time
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from Code.classifiers.SKClassifier import SKClassifier
 from Code.indexer import Indexer
 from Code.parser import EnglishParser
 from Code.utils import create_vector_space, VectorSpace
@@ -7,69 +11,69 @@ import numpy as np
 import csv
 
 
-class KNNClassifier(Classifier):
+class KNNClassifier(SKClassifier):
 
     def __init__(self, neighbor_count: int):
         super().__init__()
         self.neighbor_count = neighbor_count
-        self.parser = EnglishParser(preload_corpus=False)
-        self.indexer = Indexer("english", generic=True)
-        self.indexer.parser = self.parser
-        self.vector_space: VectorSpace = None
-        self.doc_to_tag_map = {}
+        self.full_train_dot_vec = np.ndarray((1,))
 
-    def train(self, train_data, model_address=None, vs_address=None):
-        self.parser.load_english_documents(train_data, is_data_tagged=True)
-        if model_address is None:
-            self.indexer.index(should_write=True, file_name="DataSet/indexes/english_train_index")
-        else:
-            self.indexer.index_filename = model_address
-            self.indexer.read_index_table()
-        self.vector_space = create_vector_space(self.indexer, table_file_saved=True, should_write=True,
-                                                write_address="DataSet/vector_spaces/english_train_space",
-                                                vs_address=vs_address)
-        self._generate_doc_to_tag_map(train_data[1:])
-        confusion_matrices = self._predict_and_calculate_confusion_matrix(train_data[1:])
+    def train(self, train_data, should_eval=True):
+        self.train_set_labels = train_data[1]
+        self.tags_list = list(set(self.train_set_labels))
+        self.train_set = train_data[0]
+        self.train_set_vs = self.vectorizer.fit_transform(self.train_set)
+        tmp = self.train_set_vs.dot(self.train_set_vs.T)
+        self.full_train_dot_vec = np.diag(tmp.toarray())[:, np.newaxis]
         print("Training Finished")
-        self.print_information(confusion_matrices)
+        if should_eval:
+            self.predict_and_show_metrics(self.train_set_labels, self.train_set)
 
     def test(self, test_data):
-        confusion_matrices = self._predict_and_calculate_confusion_matrix(test_data[1:])
+        self.test_set_labels = test_data[1]
+        self.test_set = test_data[0]
+        self.test_set_vs = self.vectorizer.transform(self.test_set)
         print("Test Finished")
-        self.print_information(confusion_matrices)
-
-    def _generate_doc_to_tag_map(self, train_data):
-        for i, row in enumerate(train_data):
-            if row[0] not in self.tags_list:
-                self.tags_list.append(row[0])
-            self.doc_to_tag_map[i] = row[0]
+        self.predict_and_show_metrics(self.test_set_labels, self.test_set)
 
     def predict_single_input(self, input_str):
-        lemmatized_tokens = self.parser.parse_text(input_str, remove_del=True)
-        doc_id_and_dist_list = []
-        current_doc_vec = self.vector_space.calculate_query_vec(lemmatized_tokens, mode="ntn", sparse=False)
-        for doc_id in self.vector_space.doc_dict.keys():
-            other_doc_vec = self.vector_space.get_doc_vec(doc_id, mode="ntn", sparse=False)
-            doc_id_and_dist_list.append((doc_id, np.linalg.norm(current_doc_vec - other_doc_vec)))
-        doc_id_and_dist_list.sort(key=lambda x: x[1])
+        current_doc_vec = self.vectorizer.transform([input_str])
+        now = time.time_ns()
+
+        train_to_current_dot_vec = self.train_set_vs.dot(current_doc_vec.T).toarray()
+        current_vec_dot = current_doc_vec.dot(current_doc_vec.T).toarray()
+        distances_vector = (current_vec_dot - 2 * train_to_current_dot_vec + self.full_train_dot_vec).ravel()
+
+        #     other_doc_vec = self.train_set_vs[doc_id]
+        #     doc_id_and_dist_list.append((doc_id,
+        #                                  scipy.sparse.csr_matrix.dot(current_doc_vec, current_doc_vec.transpose()) -
+        #                                  2 * scipy.sparse.csr_matrix.dot(current_doc_vec, other_doc_vec.transpose()) +
+        #                                 scipy.sparse.csr_matrix.dot(other_doc_vec, other_doc_vec.transpose())))
+        args = np.argsort(distances_vector)
         count_per_tag = {}
+        sum_per_tag = {}
         for tag in self.tags_list:
             count_per_tag[tag] = 0
-        break_index = min(self.neighbor_count, len(doc_id_and_dist_list))
-        for pair in doc_id_and_dist_list[:break_index]:
-            count_per_tag[self.doc_to_tag_map[pair[0]]] += 1
-        max_tag = self.tags_list[0]
-        max_count = -1
+            sum_per_tag[tag] = 0
+        break_index = min(self.neighbor_count, len(args))
+        for index in args[:break_index]:
+            count_per_tag[self.train_set_labels[index]] += 1
+            sum_per_tag[self.train_set_labels[index]] += distances_vector[index]
+        max_count = max(count_per_tag.values())
+        max_tag = -1
+        min_sum = np.inf
         for tag in self.tags_list:
-            if count_per_tag[tag] > max_count:
+            if count_per_tag[tag] >= max_count and sum_per_tag[tag] < min_sum:
                 max_tag = tag
-                max_count = count_per_tag[tag]
-        print(f'predicted {input_str} to {max_tag}')
+                min_sum = sum_per_tag[tag]
+
+        print(max_tag, time.time_ns() - now)
         return max_tag
 
 
 if __name__ == '__main__':
     classifier = KNNClassifier(5)
-    with open("DataSet/training_data/phase2_train.csv") as f:
-        classifier.train(list(csv.reader(f, delimiter=',')), model_address="DataSet/indexes/english_train_index",
-                         vs_address="DataSet/vector_spaces/english_train_space")
+    # with open("DataSet/phase2/phase2_train.csv") as f:
+    #     classifier.train(list(csv.reader(f, delimiter=',')))
+    classifier.train(classifier.read_data_from_file("DataSet/phase2/phase2_train.csv"), should_eval=True)
+    classifier.test(classifier.read_data_from_file("DataSet/phase2/phase2_test.csv"))

@@ -1,3 +1,7 @@
+from sklearn import metrics
+import numpy as np
+
+
 class Classifier:
 
     def __init__(self):
@@ -23,6 +27,16 @@ class Classifier:
             print(f"\t\tRecall: {recall}")
             print(f"\t\tF1: {f1}")
             print("-------------------------------------------")
+
+    def print_metrics(self, predictions, correct_tags):
+        print("Confusion Matrix:\n", metrics.confusion_matrix(correct_tags, predictions))
+        # TODO here we must do something with our tags_list and generic confusion matrix format
+        # self.print_information(metrics.confusion_matrix(correct_tags, predictions))
+        print(metrics.classification_report(correct_tags, predictions))
+        print(metrics.accuracy_score(correct_tags, predictions))
+        print('Mean Absolute Error:', metrics.mean_absolute_error(correct_tags, predictions))
+        print('Mean Squared Error:', metrics.mean_squared_error(correct_tags, predictions))
+        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(correct_tags, predictions)))
 
     def _predict_and_calculate_confusion_matrix(self, predict_dataset):
         # TP FP FN TN

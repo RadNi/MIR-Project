@@ -1,3 +1,4 @@
+
 import numpy as np
 
 from Code.classifiers.classifier import Classifier
@@ -19,7 +20,7 @@ class SKClassifier(Classifier):
         self.train_set_vs = []
         self.test_set_vs = []
         self.test_set_labels = []
-        self.vectorizer = TfidfVectorizer(use_idf=True, smooth_idf=True)
+        self.vectorizer = TfidfVectorizer(use_idf=True, smooth_idf=True, norm=None)
         self.train_set_labels = []
 
     def read_data_from_file(self, file_name):
@@ -40,6 +41,18 @@ class SKClassifier(Classifier):
         self.model.fit(self.train_set_vs, self.train_set_labels)
         # print(self.model.feature_importances_)
         # train_test_split()
+
+    def predict_and_show_metrics(self, correct_tags, data=None, vector_space: np.ndarray=None):
+        if data is not None:
+            predictions = np.ndarray(shape=(len(data),), dtype=np.int32)
+            for i, row in enumerate(data):
+                predictions[i] = self.predict_single_input(input_str=row)
+        else:
+            predictions = np.ndarray(shape=(len(vector_space.shape[0]),), dtype=np.int32)
+            for i in range(vector_space.shape[0]):
+                vec = vector_space[i, :]
+                predictions[i] = self.predict_single_input(input_vec=vec)
+        self.print_metrics(predictions, correct_tags)
 
     @staticmethod
     def _calculate_all_words(indexer):
@@ -71,9 +84,3 @@ class SKClassifier(Classifier):
         print('Mean Squared Error:', metrics.mean_squared_error(self.test_set_labels, y_pred))
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(self.test_set_labels, y_pred)))
 
-
-if __name__ == '__main__':
-    rf = RandomForestClassifier()
-    train_set = rf.read_data_from_file("DataSet/phase2/phase2_train.csv")
-    rf.train(train_set)
-    rf.test(rf.read_data_from_file("DataSet/phase2/phase2_test.csv"))
