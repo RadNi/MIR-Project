@@ -1,6 +1,7 @@
 from sklearn import metrics
 import numpy as np
 from Code.indexer import Indexer
+from Code.utils import create_vector_space, VectorSpace
 from Code.constants import FILE_ADDR_PREFIX
 
 from Code.indexer import Indexer, csv
@@ -8,11 +9,11 @@ from Code.indexer import Indexer, csv
 
 class Classifier:
 
-    def __init__(self, class_name):
+    def __init__(self, class_name, **kwargs):
         self.class_name = class_name
         self.cluster_count = 4
         self.tags_list = []
-        self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False)
+        self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False, **kwargs)
 
     @staticmethod
     def _calculate_all_words(indexer):
@@ -97,6 +98,9 @@ class Classifier:
     def predict_single_input(self, input_str):
         return NotImplementedError
 
+    def get_corpus_address(self):
+        return FILE_ADDR_PREFIX + "/" + self.class_name + "/phase1_labeled_"
+
     def rewrite_csv_with_label(self, source_file, labels):
         documents = {1: [], 2: [], 3: [], 4: []}
         with open(source_file, encoding="utf8") as csv_file:
@@ -109,7 +113,7 @@ class Classifier:
             print(f'Processed {line_count} lines.')
 
         for label in list(documents.keys()):
-            with open(FILE_ADDR_PREFIX + "/" + self.class_name + "/phase1_labeled_" + str(label) + ".csv", mode='w') as csv_file:
+            with open(self.get_corpus_address() + str(label) + ".csv", mode='w') as csv_file:
                 csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 csv_writer.writerow(["Title", "Text"])
                 for doc in documents[label]:
@@ -126,3 +130,25 @@ class Classifier:
         print('Mean Absolute Error:', metrics.mean_absolute_error(y_real, y_pred))
         print('Mean Squared Error:', metrics.mean_squared_error(y_real, y_pred))
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_real, y_pred)))
+
+    def customised_index_creator(self, label):
+        indexer = Indexer("english", preload_corpus=False, is_data_tagged=False)
+        indexer.parser.read_english_documents(self.get_corpus_address() + str(label) + ".csv", True)
+        indexer.bigram_index_filename = self.get_corpus_address() + str(label) + "_bigram"
+        indexer.index_filename = self.get_corpus_address() + str(label) + "_index"
+        return indexer
+
+    def create_index_and_bigram(self):
+        for i in range(1, 5):
+            indexer = self.customised_index_creator(i)
+            indexer.index()
+            indexer.create_bigram_index()
+
+    def create_vector_space(self):
+        for i in range(1, 5):
+            indexer = self.customised_index_creator(i)
+            create_vector_space(indexer=indexer, write_address=self.get_corpus_address() + str(i) + "_vs",
+                                should_write=True)
+
+    def read_vector_space_model(self, label):
+        return VectorSpace.read_vector_space_model("english", self.get_corpus_address() + str(label) + "_vs")

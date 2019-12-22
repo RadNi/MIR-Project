@@ -105,7 +105,7 @@ class Parser:
 class EnglishParser(Parser):
     Delimiters = [';', '#', ')', '(', '.', ':', '/', '?', '\\', ',', '\n', '&']
 
-    def __init__(self, preload_corpus=True, is_data_tagged=False):
+    def __init__(self, preload_corpus=True, is_data_tagged=False, corpus_address="DataSet/corpus/English.csv"):
         common_words_filename = "DataSet/common_words/english_common_words"
         super().__init__(freq_threshold=100, common_words_filename=common_words_filename)
 
@@ -119,7 +119,7 @@ class EnglishParser(Parser):
         if is_data_tagged:
             self.first_row = []
         if preload_corpus:
-            self.documents = self.read_english_documents("DataSet/corpus/English.csv")
+            self.documents = self.read_english_documents(corpus_address)
 
     def _prepare_complete_text(self, doc):
         return doc

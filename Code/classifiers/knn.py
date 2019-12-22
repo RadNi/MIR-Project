@@ -13,7 +13,7 @@ import csv
 
 class KNNClassifier(SKClassifier):
 
-    def __init__(self, neighbor_count: int):
+    def __init__(self, neighbor_count: int = 5):
         super().__init__("knn")
         self.neighbor_count = neighbor_count
         self.full_train_dot_vec = np.ndarray((1,))
@@ -75,11 +75,24 @@ class KNNClassifier(SKClassifier):
         return max_tag
 
 
+# def create_index_file():
+#     nbc = KNNClassifier(5)
+#     for i in range(1, 5):
+#         indexer = Indexer("english", preload_corpus=False, is_data_tagged=False)
+#         indexer.parser.read_english_documents(nbc.get_corpus_address() + str(i) + ".csv", True)
+#         indexer.bigram_index_filename = nbc.get_corpus_address() + str(i) + "_bigram"
+#         indexer.index_filename = nbc.get_corpus_address() + str(i) + "_index"
+#         indexer.index()
+#         indexer.create_bigram_index()
+
+
 if __name__ == '__main__':
+    # create_index_file()
     nbc = KNNClassifier(5)
-    train_set = nbc.read_data_from_file("DataSet/phase2/phase2_train.csv")
-    nbc.train(train_set)
-    x, y = nbc.read_data_from_file("DataSet/phase2/phase2_test.csv")
-    y_pred = nbc.test(x)
-    nbc.show_prediction_result(y_pred, y)
-    nbc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
+    nbc.create_index_and_bigram()
+    # train_set = nbc.read_data_from_file("DataSet/phase2/phase2_train.csv")
+    # nbc.train(train_set)
+    # x, y = nbc.read_data_from_file("DataSet/phase2/phase2_test.csv")
+    # y_pred = nbc.test(x)
+    # nbc.show_prediction_result(y_pred, y)
+    # nbc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)

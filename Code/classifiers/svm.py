@@ -17,3 +17,4 @@ if __name__ == '__main__':
         y_pred = svmc.test(x)
         svmc.show_prediction_result(y_pred, y)
         svmc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
+        svmc.create_index_and_bigram()

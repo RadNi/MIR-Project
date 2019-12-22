@@ -77,3 +77,5 @@ if __name__ == '__main__':
     y_pred = rf.test(x)
     rf.show_prediction_result(y_pred, y)
     rf.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
+    rf.create_index_and_bigram()
+    rf.create_vector_space()

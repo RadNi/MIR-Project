@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 class SKClassifier(Classifier):
 
-    def __init__(self, class_name):
-        super().__init__(class_name)
+    def __init__(self, class_name, **kwargs):
+        super().__init__(class_name=class_name, **kwargs)
         self.model = None
         # self.model = sklearnRandomForestClassifier(max_depth=2000, random_state=0)
         self.train_set = []

@@ -91,3 +91,4 @@ if __name__ == '__main__':
     y_pred = nbc.test(x)
     nbc.show_prediction_result(y_pred, y)
     nbc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
+    nbc.create_index_and_bigram()
