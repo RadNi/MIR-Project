@@ -62,14 +62,18 @@ class Classifier:
         print('Mean Squared Error:', metrics.mean_squared_error(correct_tags, predictions))
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(correct_tags, predictions)))
 
-    def _predict_and_calculate_confusion_matrix(self, predict_dataset):
+    def _predict_and_calculate_confusion_matrix(self, predict_dataset, has_header=True):
         # TP FP FN TN
         confusion_matrices = {}
         for tag in self.tags_list:
             confusion_matrices[tag] = [0, 0, 0, 0]
         for data in predict_dataset:
             correct_tag = data[0]
-            predicted_tag = self.predict_single_input(f'{data[1]} {data[2]}')
+            if has_header:
+                predicted_tag = self.predict_single_input(f'{data[1]} {data[2]}')
+            else:
+                predicted_tag = self.predict_single_input(data[1])
+
             for tag in self.tags_list:
                 if tag == correct_tag:
                     if tag == predicted_tag:

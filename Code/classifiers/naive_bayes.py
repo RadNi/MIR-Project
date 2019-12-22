@@ -17,14 +17,15 @@ class NaiveBayesClassifier(Classifier):
         self.all_words_count = 0
 
     def train(self, train_data):
-        self.english_parser.load_english_documents(train_data, is_data_tagged=True)
-        self._create_class_index(train_data)
-        confusion_matrices = self._predict_and_calculate_confusion_matrix(train_data[1:])
+        tags, data = train_data
+        self.english_parser.load_english_documents(data, is_data_tagged=False, has_header=False)
+        self._create_class_index(tags)
+        confusion_matrices = self._predict_and_calculate_confusion_matrix(train_data)
         print("Training Finished")
         self.print_information(confusion_matrices)
 
     def test(self, test_data):
-        confusion_matrices = self._predict_and_calculate_confusion_matrix(test_data[1:])
+        confusion_matrices = self._predict_and_calculate_confusion_matrix(test_data)
         print("Test Finished")
         self.print_information(confusion_matrices)
 
@@ -46,10 +47,10 @@ class NaiveBayesClassifier(Classifier):
                 best_tag = tag
         return best_tag
 
-    def _create_class_index(self, train_data):
-        for doc_id in range(1, len(train_data)):
-            lemmatized_tokens = self.english_parser.parse_doc(doc_id - 1, remove_del=True)
-            current_tag = train_data[doc_id][0]
+    def _create_class_index(self, tag_list):
+        for doc_id in range(len(tag_list)):
+            lemmatized_tokens = self.english_parser.parse_doc(doc_id, remove_del=True)
+            current_tag = tag_list[doc_id]
             index_dict = {}
             if current_tag in self.class_index.keys():
                 index_dict = self.class_index[current_tag]
@@ -71,7 +72,7 @@ class NaiveBayesClassifier(Classifier):
         # Calculating P(c)
         for class_tag in self.tags_list:
             self.class_probabilities[class_tag] = 0
-        for i in range(1, len(train_data)):
-            self.class_probabilities[train_data[i][0]] += 1
+        for i in range(len(tag_list)):
+            self.class_probabilities[tag_list[i]] += 1
         for class_tag in self.tags_list:
-            self.class_probabilities[class_tag] /= len(train_data) - 1
+            self.class_probabilities[class_tag] /= len(tag_list) - 1
