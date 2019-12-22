@@ -4,7 +4,9 @@ from Code.constants import *
 
 class Indexer:
 
-    def __init__(self, mode, generic=False, preload_corpus=True, is_data_tagged=False):
+    def __init__(self, mode, generic=False, preload_corpus=True, is_data_tagged=False,
+                 bigram_index_file_name="DataSet/bigram_tables/english_bigram",
+                 index_filename = "DataSet/indexes/english_index"):
         if not generic:
             if mode == 'persian':
                 self.parser = PersianParser()
@@ -12,8 +14,8 @@ class Indexer:
                 self.index_filename = "DataSet/indexes/persian_index"
             elif mode == 'english':
                 self.parser = EnglishParser(is_data_tagged=is_data_tagged, preload_corpus=preload_corpus)
-                self.bigram_index_filename = "DataSet/bigram_tables/english_bigram"
-                self.index_filename = "DataSet/indexes/english_index"
+                self.bigram_index_filename = bigram_index_file_name
+                self.index_filename = index_filename
         self.posting_list = dict()
         self.bigram_index = {}
 
@@ -107,7 +109,7 @@ class Indexer:
         for id in docids:
             print(id, ":", i, "/", len(docids))
             i += 1
-            all_terms = self._create_all_terms(id)
+            all_terms = self.create_all_terms(id)
             for term in all_terms:
                 self._add_term_to_bigram(term)
         self._write_bigram_to_file()
