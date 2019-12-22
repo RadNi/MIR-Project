@@ -3,7 +3,8 @@ from Code.searcher import Searcher
 from Code.parser import PersianParser, EnglishParser
 from Code.utils import VectorSpace
 from Code.indexer import Indexer
-
+from Code.classifiers.random_forest import RandomForestClassifier
+from Code.classifiers.svm import SVMClassifier
 
 def print_line():
     print("-------------------------------\n")
@@ -34,6 +35,38 @@ Choose your document id to parse
         print(p.parse_doc(doc_id))
     elif selection == "2":
         p.extract_common_words()
+
+
+def train_classifier(classifier):
+    train_set = classifier.read_data_from_file("DataSet/phase2/phase2_train.csv")
+    classifier.train(train_set)
+    # classifier.test(classifier.read_data_from_file("DataSet/phase2/phase2_test.csv"))
+
+
+def choose_class():
+    cls = int(input("""
+Choose your desired class.
+\t1. 
+\t2. 
+\t3. 
+\t4. 
+"""))
+    return cls
+
+
+def classifier_search():
+    clsf_search = input("""
+Choose your classifier.
+\t1. KNN
+\t2. SVM
+\t3. Random Forest
+\t4. Naive Bayes
+""")
+    if clsf_search == "3":
+        return RandomForestClassifier()
+    elif clsf_search == "2":
+        penalty = float(input("Get penalty"))
+        return SVMClassifier(penalty)
 
 
 def create_index_tables(mode):
@@ -129,6 +162,7 @@ Enter your query, language is {mode}:
 Select what you want to do:
 \t1. Normal Search
 \t2. Proximity Search
+\t3. Classifier
 
 \t0. Back
 """)
@@ -157,6 +191,10 @@ Enter proximity window size:
                         print(f"Output is: \n{searcher.proximity_search(query, proximity_range, mode)}")
                         print_line()
                         break
+
+                elif selection2 == "3":
+                    classifier = classifier_search()
+                    cls = choose_class()
 
                 else:
                     invalid()

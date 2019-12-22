@@ -3,7 +3,7 @@ import numpy as np
 from Code.classifiers.classifier import Classifier
 from Code.indexer import Indexer
 from sklearn import metrics
-from sklearn.ensemble import RandomForestClassifier as sklearnRandomForestClassifier
+# from sklearn.ensemble import RandomForestClassifier as sklearnRandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
@@ -72,8 +72,11 @@ class SKClassifier(Classifier):
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(self.test_set_labels, y_pred)))
 
 
-if __name__ == '__main__':
-    rf = RandomForestClassifier()
-    train_set = rf.read_data_from_file("DataSet/phase2/phase2_train.csv")
-    rf.train(train_set)
-    rf.test(rf.read_data_from_file("DataSet/phase2/phase2_test.csv"))
+# if __name__ == '__main__':
+#     print(SKClassifier().read_data_from_file("DataSet/phase2/phase2_train.csv"))
+#
+# if __name__ == '__main__':
+#     rf = RandomForestClassifier()
+#     train_set = rf.read_data_from_file("DataSet/phase2/phase2_train.csv")
+#     rf.train(train_set)
+#     rf.test(rf.read_data_from_file("DataSet/phase2/phase2_test.csv"))
