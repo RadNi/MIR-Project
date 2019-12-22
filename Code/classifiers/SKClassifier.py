@@ -1,7 +1,6 @@
 import numpy as np
 
 from Code.classifiers.classifier import Classifier
-from Code.indexer import Indexer
 from sklearn import metrics
 # from sklearn.ensemble import RandomForestClassifier as sklearnRandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -12,24 +11,14 @@ class SKClassifier(Classifier):
     def __init__(self):
         super().__init__()
         self.model = None
-        self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False)
         # self.model = sklearnRandomForestClassifier(max_depth=2000, random_state=0)
         self.train_set = []
         self.test_set = []
         self.train_set_vs = []
         self.test_set_vs = []
         self.test_set_labels = []
-        self.vectorizer = TfidfVectorizer(use_idf=True, smooth_idf=True)
+        self.vectorizer = TfidfVectorizer(use_idf=True, smooth_idf=True, norm=None)
         self.train_set_labels = []
-
-    def read_data_from_file(self, file_name):
-        self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False)
-        self.indexer.set_adresses(
-            index_address="DataSet/phase2/index_train",
-            bigram_addres="DataSet/phase2/bigram_train.csv")
-        self.indexer.parser.read_english_documents(filename=file_name, set_docs=True)
-        labels = [int(label)for label in self.indexer.parser.first_row]
-        return self._calculate_all_words(self.indexer), labels
 
     def train(self, train_data):
         self.train_set_labels = train_data[1]
@@ -41,18 +30,17 @@ class SKClassifier(Classifier):
         # print(self.model.feature_importances_)
         # train_test_split()
 
-    @staticmethod
-    def _calculate_all_words(indexer):
-        print("Calculating data set words.")
-        result = []
-        line_count = 0
-        for docid in indexer.parser.get_docids():
-            line_count += 1
-            if line_count % 1000 == 0:
-                print(f'\tProcessed {line_count} doc.')
-
-            result.append(" ".join(term for term in list(indexer.create_all_terms(docid))))
-        return result
+    def predict_and_show_metrics(self, correct_tags, data=None, vector_space: np.ndarray = None):
+        if data is not None:
+            predictions = np.ndarray(shape=(len(data),), dtype=np.int32)
+            for i, row in enumerate(data):
+                predictions[i] = self.predict_single_input(input_str=row)
+        else:
+            predictions = np.ndarray(shape=(len(vector_space.shape[0]),), dtype=np.int32)
+            for i in range(vector_space.shape[0]):
+                vec = vector_space[i, :]
+                predictions[i] = self.predict_single_input(input_vec=vec)
+        self.print_metrics(predictions, correct_tags)
 
     def test(self, test_data):
 
