@@ -14,7 +14,7 @@ import csv
 class KNNClassifier(SKClassifier):
 
     def __init__(self, neighbor_count: int):
-        super().__init__()
+        super().__init__("knn")
         self.neighbor_count = neighbor_count
         self.full_train_dot_vec = np.ndarray((1,))
 
@@ -30,11 +30,14 @@ class KNNClassifier(SKClassifier):
             self.predict_and_show_metrics(self.train_set_labels, self.train_set)
 
     def test(self, test_data):
-        self.test_set_labels = test_data[1]
-        self.test_set = test_data[0]
+        self.test_set = test_data
         self.test_set_vs = self.vectorizer.transform(self.test_set)
         print("Test Finished")
-        self.predict_and_show_metrics(self.test_set_labels, self.test_set)
+        # self.predict_and_show_metrics(self.test_set_labels, self.test_set)
+        predictions = np.ndarray(shape=(len(self.test_set),), dtype=np.int32)
+        for i, row in enumerate(self.test_set):
+            predictions[i] = self.predict_single_input(input_str=row)
+        return predictions
 
     def predict_single_input(self, input_str):
         current_doc_vec = self.vectorizer.transform([input_str])
@@ -73,8 +76,10 @@ class KNNClassifier(SKClassifier):
 
 
 if __name__ == '__main__':
-    classifier = KNNClassifier(5)
-    # with open("DataSet/phase2/phase2_train.csv") as f:
-    #     classifier.train(list(csv.reader(f, delimiter=',')))
-    classifier.train(classifier.read_data_from_file("DataSet/phase2/phase2_train.csv"), should_eval=True)
-    classifier.test(classifier.read_data_from_file("DataSet/phase2/phase2_test.csv"))
+    nbc = KNNClassifier(5)
+    train_set = nbc.read_data_from_file("DataSet/phase2/phase2_train.csv")
+    nbc.train(train_set)
+    x, y = nbc.read_data_from_file("DataSet/phase2/phase2_test.csv")
+    y_pred = nbc.test(x)
+    nbc.show_prediction_result(y_pred, y)
+    nbc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)

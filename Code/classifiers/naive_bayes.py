@@ -8,7 +8,7 @@ from Code.parser import EnglishParser
 class NaiveBayesClassifier(Classifier):
 
     def __init__(self):
-        super().__init__()
+        super().__init__("naive_bayes")
         self.english_parser = EnglishParser(preload_corpus=False)
         self.class_index = {}
         self.class_probabilities = {}
@@ -17,17 +17,22 @@ class NaiveBayesClassifier(Classifier):
         self.all_words_count = 0
 
     def train(self, train_data):
-        tags, data = train_data
+        data, tags = train_data
         self.english_parser.load_english_documents(data, is_data_tagged=False, has_header=False)
         self._create_class_index(tags)
-        confusion_matrices = self._predict_and_calculate_confusion_matrix(train_data)
+        confusion_matrices = self._predict_and_calculate_confusion_matrix(train_data, has_header=False)
         print("Training Finished")
         self.print_information(confusion_matrices)
 
     def test(self, test_data):
-        confusion_matrices = self._predict_and_calculate_confusion_matrix(test_data)
+        # confusion_matrices = self._predict_and_calculate_confusion_matrix(test_data)
+        data = test_data
+        predictions = np.ndarray(shape=(len(data),), dtype=np.int32)
+        for i, row in enumerate(data):
+            predictions[i] = self.predict_single_input(row)
         print("Test Finished")
-        self.print_information(confusion_matrices)
+        return predictions
+        # self.print_information(confusion_matrices)
 
     def predict_single_input(self, input_str):
         lemmatized_tokens = self.english_parser.parse_text(input_str, remove_del=True)
@@ -48,7 +53,7 @@ class NaiveBayesClassifier(Classifier):
         return best_tag
 
     def _create_class_index(self, tag_list):
-        for doc_id in range(len(tag_list)):
+        for doc_id in range(len(tag_list) - 1):
             lemmatized_tokens = self.english_parser.parse_doc(doc_id, remove_del=True)
             current_tag = tag_list[doc_id]
             index_dict = {}
@@ -76,3 +81,13 @@ class NaiveBayesClassifier(Classifier):
             self.class_probabilities[tag_list[i]] += 1
         for class_tag in self.tags_list:
             self.class_probabilities[class_tag] /= len(tag_list) - 1
+
+
+if __name__ == '__main__':
+    nbc = NaiveBayesClassifier()
+    train_set = nbc.read_data_from_file("DataSet/phase2/phase2_train.csv")
+    nbc.train(train_set)
+    x, y = nbc.read_data_from_file("DataSet/phase2/phase2_test.csv")
+    y_pred = nbc.test(x)
+    nbc.show_prediction_result(y_pred, y)
+    nbc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
