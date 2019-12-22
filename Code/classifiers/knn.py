@@ -51,21 +51,22 @@ class KNNClassifier(SKClassifier):
         #                                 scipy.sparse.csr_matrix.dot(other_doc_vec, other_doc_vec.transpose())))
         args = np.argsort(distances_vector)
         count_per_tag = {}
-        sum_per_tag = {}
+        min_dist_for_tag = {}
         for tag in self.tags_list:
             count_per_tag[tag] = 0
-            sum_per_tag[tag] = 0
+            min_dist_for_tag[tag] = 0
         break_index = min(self.neighbor_count, len(args))
         for index in args[:break_index]:
             count_per_tag[self.train_set_labels[index]] += 1
-            sum_per_tag[self.train_set_labels[index]] += distances_vector[index]
+            if min_dist_for_tag[self.train_set_labels[index]] > distances_vector[index]:
+                min_dist_for_tag[self.train_set_labels[index]] += distances_vector[index]
         max_count = max(count_per_tag.values())
         max_tag = -1
-        min_sum = np.inf
+        min_dist = np.inf
         for tag in self.tags_list:
-            if count_per_tag[tag] >= max_count and sum_per_tag[tag] < min_sum:
+            if count_per_tag[tag] >= max_count and min_dist_for_tag[tag] < min_dist:
                 max_tag = tag
-                min_sum = sum_per_tag[tag]
+                min_dist = min_dist_for_tag[tag]
 
         print(max_tag, time.time_ns() - now)
         return max_tag
