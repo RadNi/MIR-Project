@@ -51,17 +51,7 @@ class SKClassifier(Classifier):
         y_pred = self.model.predict(self.test_set_vs)
         return y_pred
 
-    @staticmethod
-    def show_prediction_result(y_pred, y_real):
 
-        print("Confusion Matrix:\n", metrics.confusion_matrix(y_real, y_pred))
-        # TODO here we must do something with our tags_list and generic confusion matrix format
-        # self.print_information(metrics.confusion_matrix(self.test_set_labels, y_pred))
-        print(metrics.classification_report(y_real, y_pred))
-        print(metrics.accuracy_score(y_real, y_pred))
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_real, y_pred))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_real, y_pred))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_real, y_pred)))
 
 
 # if __name__ == '__main__':

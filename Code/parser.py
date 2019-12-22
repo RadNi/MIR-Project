@@ -150,14 +150,12 @@ class EnglishParser(Parser):
 
     def load_english_documents(self, documents_data, is_data_tagged=True, has_header=True):
         documents = []
-        for i in range(1, len(documents_data)):
-            if is_data_tagged:
+        if is_data_tagged:
+            for i in range(1, len(documents_data)):
                 documents.append(f'{documents_data[i][1]} {documents_data[i][2]}')
-            else:
-                if has_header:
-                    documents.append(f'{documents_data[i][0]} {documents_data[i][1]}')
-                else:
-                    documents.append(documents_data[i])
+        else:
+            for row in documents_data:
+                documents.append(row)
         self.documents = documents
 
     def get_docids(self):
