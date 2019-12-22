@@ -100,6 +100,17 @@ def create_search_basedon_class(classifier, label):
     return Searcher(query_corrector, index_table, parser, vector_space)
 
 
+# def show_documents(searcher, docids):
+#     query = input(f"""
+#         Do you want to see actual documents?
+#         """)
+#     if query:
+#         for docid in docids:
+#             searcher.parser.read_english_documents(searcher.parser.doc_address)
+#             print(searcher.parser.documents)
+#             print(searcher.parser.documents[docid])
+#     print_line()
+
 def do_normal_and_proximity_search(selection2, searcher):
     if selection2 == "0":
         print_line()
@@ -108,7 +119,10 @@ def do_normal_and_proximity_search(selection2, searcher):
         query = input(f"""
     Enter your query, language is {mode}:
     """)
-        print(f"Output is:\n {searcher.search(query, mode)}")
+        docids = searcher.search(query, mode)
+        print(f"Output is:\n {docids}")
+        # show_documents(searcher, docids)
+
         print_line()
     elif selection2 == "2":
         query = input(f"""
@@ -123,8 +137,10 @@ def do_normal_and_proximity_search(selection2, searcher):
             if proximity_range <= 0:
                 print("Enter an integer bigger than 0:")
                 continue
-            print(f"Output is: \n{searcher.proximity_search(query, proximity_range, mode)}")
+            docids = searcher.proximity_search(query, proximity_range, mode)
+            print(f"Output is: \n{docids}")
             print_line()
+            # show_documents(searcher, docids)
             return False
     return True
 
@@ -218,7 +234,7 @@ Select what you want to do:
                 elif selection2 == "3":
                     classifier = classifier_search()
                     cls = choose_class()
-                    searcher = create_search_basedon_class(classifier, cls)
+                    searcherr = create_search_basedon_class(classifier, cls)
 
                     selection3 = input("""
                     Select what you want to do:
@@ -227,7 +243,7 @@ Select what you want to do:
 
                     \t0. Back
                     """)
-                    do_normal_and_proximity_search(selection3, searcher)
+                    do_normal_and_proximity_search(selection3, searcherr)
                 else:
                     invalid()
 

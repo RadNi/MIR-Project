@@ -9,7 +9,7 @@ class SVMClassifier(SKClassifier):
 
 
 if __name__ == '__main__':
-    for penalty in [1/2, 1, 3/2, 2]:
+    for penalty in [1/2, 1.0, 3/2, 2.0]:
         svmc = SVMClassifier(penalty=penalty)
         train_set = svmc.read_data_from_file("DataSet/phase2/phase2_train.csv")
         svmc.train(train_set)
@@ -18,3 +18,4 @@ if __name__ == '__main__':
         svmc.show_prediction_result(y_pred, y)
         svmc.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
         svmc.create_index_and_bigram()
+        svmc.create_vector_space()

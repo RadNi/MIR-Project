@@ -116,6 +116,7 @@ class EnglishParser(Parser):
         self.lemmatizer = nltk.stem.WordNetLemmatizer().lemmatize
         self.word_tokenize = nltk.tokenize.word_tokenize
         self.is_data_tagged = is_data_tagged
+        self.doc_address = corpus_address
         if is_data_tagged:
             self.first_row = []
         if preload_corpus:
@@ -145,6 +146,7 @@ class EnglishParser(Parser):
                 line_count += 1
             print(f'Processed {line_count} lines.')
         if set_docs:
+            self.doc_address = filename
             self.documents = documents
         return documents
 

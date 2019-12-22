@@ -151,4 +151,5 @@ class Classifier:
                                 should_write=True)
 
     def read_vector_space_model(self, label):
+        print(self.get_corpus_address() + str(label) + "_vs")
         return VectorSpace.read_vector_space_model("english", self.get_corpus_address() + str(label) + "_vs")

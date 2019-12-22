@@ -89,7 +89,8 @@ class KNNClassifier(SKClassifier):
 if __name__ == '__main__':
     # create_index_file()
     nbc = KNNClassifier(5)
-    nbc.create_index_and_bigram()
+    # nbc.create_index_and_bigram()
+    nbc.create_vector_space()
     # train_set = nbc.read_data_from_file("DataSet/phase2/phase2_train.csv")
     # nbc.train(train_set)
     # x, y = nbc.read_data_from_file("DataSet/phase2/phase2_test.csv")
