@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 class SKClassifier(Classifier):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, class_name):
+        super().__init__(class_name)
         self.model = None
         # self.model = sklearnRandomForestClassifier(max_depth=2000, random_state=0)
         self.train_set = []
@@ -44,20 +44,24 @@ class SKClassifier(Classifier):
 
     def test(self, test_data):
 
-        self.test_set_labels = test_data[1]
-        self.test_set = test_data[0]
+        # self.test_set_labels = test_data[1]
+        self.test_set = test_data
         self.test_set_vs = self.vectorizer.transform(self.test_set)
 
         y_pred = self.model.predict(self.test_set_vs)
+        return y_pred
 
-        print("Confusion Matrix:\n", metrics.confusion_matrix(self.test_set_labels, y_pred))
+    @staticmethod
+    def show_prediction_result(y_pred, y_real):
+
+        print("Confusion Matrix:\n", metrics.confusion_matrix(y_real, y_pred))
         # TODO here we must do something with our tags_list and generic confusion matrix format
         # self.print_information(metrics.confusion_matrix(self.test_set_labels, y_pred))
-        print(metrics.classification_report(self.test_set_labels, y_pred))
-        print(metrics.accuracy_score(self.test_set_labels, y_pred))
-        print('Mean Absolute Error:', metrics.mean_absolute_error(self.test_set_labels, y_pred))
-        print('Mean Squared Error:', metrics.mean_squared_error(self.test_set_labels, y_pred))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(self.test_set_labels, y_pred)))
+        print(metrics.classification_report(y_real, y_pred))
+        print(metrics.accuracy_score(y_real, y_pred))
+        print('Mean Absolute Error:', metrics.mean_absolute_error(y_real, y_pred))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_real, y_pred))
+        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_real, y_pred)))
 
 
 # if __name__ == '__main__':

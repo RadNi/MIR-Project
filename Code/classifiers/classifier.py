@@ -1,11 +1,15 @@
 from sklearn import metrics
 import numpy as np
 from Code.indexer import Indexer
+from Code.constants import FILE_ADDR_PREFIX
+
+from Code.indexer import Indexer, csv
 
 
 class Classifier:
 
-    def __init__(self):
+    def __init__(self, class_name):
+        self.class_name = class_name
         self.cluster_count = 4
         self.tags_list = []
         self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False)
@@ -89,3 +93,21 @@ class Classifier:
 
     def predict_single_input(self, input_str):
         return NotImplementedError
+
+    def rewrite_csv_with_label(self, source_file, labels):
+        documents = {1: [], 2: [], 3: [], 4: []}
+        with open(source_file, encoding="utf8") as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            for row in csv_reader:
+                if line_count != 0:
+                    documents[labels[line_count - 1]].append([row[0], row[1]])
+                line_count += 1
+            print(f'Processed {line_count} lines.')
+
+        for label in list(documents.keys()):
+            with open(FILE_ADDR_PREFIX + "/" + self.class_name + "/phase1_labeled_" + str(label) + ".csv", mode='w') as csv_file:
+                csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                csv_writer.writerow(["Title", "Text"])
+                for doc in documents[label]:
+                    csv_writer.writerow(doc)

@@ -1,7 +1,5 @@
 import numpy as np
-
 from Code.classifiers.SKClassifier import SKClassifier
-from Code.indexer import Indexer
 from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier as sklearnRandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -10,7 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 class RandomForestClassifier(SKClassifier):
 
     def __init__(self):
-        super().__init__()
+        super().__init__(class_name="random_forest")
         # self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False)
         self.model = sklearnRandomForestClassifier(max_depth=2000, random_state=0)
         # self.train_set = []
@@ -75,4 +73,7 @@ if __name__ == '__main__':
     rf = RandomForestClassifier()
     train_set = rf.read_data_from_file("DataSet/phase2/phase2_train.csv")
     rf.train(train_set)
-    rf.test(rf.read_data_from_file("DataSet/phase2/phase2_test.csv"))
+    x, y = rf.read_data_from_file("DataSet/phase2/phase2_test.csv")
+    y_pred = rf.test(x)
+    rf.show_prediction_result(y_pred, y)
+    rf.rewrite_csv_with_label("DataSet/corpus/English.csv", y_pred)
