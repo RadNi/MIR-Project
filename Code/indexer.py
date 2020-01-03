@@ -4,17 +4,23 @@ from Code.constants import *
 
 class Indexer:
 
-    def __init__(self, mode):
+    def __init__(self, mode, preload_corpus=True, is_data_tagged=False,
+                 bigram_index_file_name="DataSet/bigram_tables/english_bigram",
+                 index_filename="DataSet/indexes/english_index"):
         if mode == 'persian':
             self.parser = PersianParser()
             self.bigram_index_filename = "DataSet/bigram_tables/persian_bigram"
             self.index_filename = "DataSet/indexes/persian_index"
         elif mode == 'english':
-            self.parser = EnglishParser()
-            self.bigram_index_filename = "DataSet/bigram_tables/english_bigram"
-            self.index_filename = "DataSet/indexes/english_index"
+            self.parser = EnglishParser(is_data_tagged=is_data_tagged, preload_corpus=preload_corpus)
+            self.bigram_index_filename = bigram_index_file_name
+            self.index_filename = index_filename
         self.posting_list = dict()
         self.bigram_index = {}
+
+    def set_adresses(self, index_address, bigram_addres):
+        self.index_filename = index_address
+        self.bigram_index_filename = bigram_addres
 
     def _merge_index(self, table, id):
         for term in table:
@@ -48,11 +54,15 @@ class Indexer:
         dict_of_elems = {key: value for key, value in dict_of_elems.items()}
         return dict_of_elems
 
-    def _write_index_to_file(self):
-        with open(self.index_filename, "w", encoding="utf8") as f:
-            f.write(str(self.posting_list))
+    def _write_index_to_file(self, file_name=None):
+        if file_name is None:
+            with open(self.index_filename, "w", encoding="utf8") as f:
+                f.write(str(self.posting_list))
+        else:
+            with open(file_name, "w", encoding="utf8") as f:
+                f.write(str(self.posting_list))
 
-    def _create_all_terms(self, page_id):
+    def create_all_terms(self, page_id):
         all_terms = set()
         ind = self.parser.parse_doc(page_id, only_tokenize=True, remove_del=True, verbose=False)
         for term in ind:
@@ -75,10 +85,14 @@ class Indexer:
         with open(self.bigram_index_filename, "w", encoding="utf8") as f:
             f.write(str(self.bigram_index))
 
-    def read_index_table(self):
+    def read_index_table(self, index_address=None):
         print("Reading index table ...")
-        with open(self.index_filename, "r", encoding="utf8") as f:
-            return eval(f.read())
+        if index_address is None:
+            with open(self.index_filename, "r", encoding="utf8") as f:
+                return eval(f.read())
+        else:
+            with open(index_address, "r", encoding="utf8") as f:
+                return eval(f.read())
 
     def read_bigram(self):
         with open(self.bigram_index_filename, "r", encoding="utf8") as f:
@@ -94,12 +108,12 @@ class Indexer:
         for id in docids:
             print(id, ":", i, "/", len(docids))
             i += 1
-            all_terms = self._create_all_terms(id)
+            all_terms = self.create_all_terms(id)
             for term in all_terms:
                 self._add_term_to_bigram(term)
         self._write_bigram_to_file()
 
-    def index(self):
+    def index(self, should_write=True, file_name=None):
         docids = self.parser.get_docids()
         i = 1
         for id in docids:
@@ -108,7 +122,8 @@ class Indexer:
             ind = self.parser.parse_doc(id)
             table = self._get_duplicates_with_info(ind)
             self._merge_index(table, id)
-        self._write_index_to_file()
+        if should_write:
+            self._write_index_to_file(file_name)
 
 
 if __name__ == '__main__':
