@@ -54,6 +54,8 @@ class Crawler(scrapy.Spider):
             url = CRAWLER_PREFIX + query
             # print(url)
             # input()
+            if query in JSON_OUTPUT:
+                continue
             if len(CRAWLED_PAGES) < DESIRED_PAGES_NUM:
                 yield scrapy.Request(url=url, callback=self.parse)
             # print(self.urls)
@@ -93,6 +95,8 @@ class Crawler(scrapy.Spider):
         self._update_urls(page_json["references"])
         CRAWLED_PAGES.append(page_json["id"])
         JSON_OUTPUT[page_json["id"]] = page_json
+        # if JSON_OUTPUT[page_json["id"]]:
+        #     input("Exists")
 
 
 process = CrawlerProcess(settings={
