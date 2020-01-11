@@ -23,6 +23,7 @@ class ClusterManager:
         self.corpus_w2v_vs = None
         self.corpus_w2v_valid_data = []
         self.corpus_tf_idf_vs = None
+        self.corpus_tf_idf_vs_small = None
         self.indexer = Indexer("english", is_data_tagged=True, preload_corpus=False, **kwargs)
 
     def load_w2v_model(self, model_address, binary=True):
@@ -77,6 +78,11 @@ class ClusterManager:
             Printer.print("Started creating corpus tf-idf model")
             corpus_joined_list = list(map(lambda x: " ".join(x), self.corpus_data))
             self.corpus_tf_idf_vs = self.tf_idf_model.fit_transform(corpus_joined_list)
+            vec_sum = np.array(np.sum(self.corpus_tf_idf_vs, axis=0))[0]
+            arg_sorted = np.argsort(vec_sum)
+            slice_range = 12
+            vec_indices = arg_sorted[vec_sum > vec_sum[arg_sorted[(len(arg_sorted) * (slice_range - 1)) // slice_range]]]
+            self.corpus_tf_idf_vs_small = self.corpus_tf_idf_vs[:, vec_indices]
             feature_list = self.tf_idf_model.get_feature_names()
             for i, feature in enumerate(feature_list):
                 self.tf_idf_word_to_ind_map[feature] = i
@@ -146,24 +152,25 @@ class ClusterManager:
 
     def cluster_tf_idf_with_k_means(self, cluster_count, output_file_address=None):
         km = KMeans(n_clusters=cluster_count)
-        distances = km.fit_transform(self.corpus_w2v_vs)
+        distances = km.fit_transform(self.corpus_tf_idf_vs_small)
         inertia = self.get_inertia(distances, km.labels_)
         if output_file_address is not None:
             self._tf_idf_result_write_to_file(output_file_address, km.labels_)
         return inertia, km.labels_, distances
 
     def cluster_w2v_with_gaussian_mixture(self, cluster_count, output_file_address=None):
-        gm = GaussianMixture(n_components=cluster_count)
+        gm = GaussianMixture(n_components=cluster_count, n_init=5)
         labels = gm.fit_predict(self.corpus_w2v_vs)
-        score = gm.score_samples(self.corpus_w2v_vs)
+        score = gm.score(self.corpus_w2v_vs)
         if output_file_address is not None:
             self._w2v_result_write_to_file(output_file_address, labels)
         return score, labels
 
     def cluster_tf_idf_with_gaussian_mixture(self, cluster_count, output_file_address=None):
-        gm = GaussianMixture(n_components=cluster_count)
-        labels = gm.fit_predict(self.corpus_tf_idf_vs)
-        score = gm.score_samples(self.corpus_tf_idf_vs)
+        gm = GaussianMixture(n_components=cluster_count, n_init=3)
+        dense_corpus = self.corpus_tf_idf_vs_small.toarray()
+        labels = gm.fit_predict(dense_corpus)
+        score = gm.score(dense_corpus)
         if output_file_address is not None:
             self._tf_idf_result_write_to_file(output_file_address, labels)
         return score, labels
@@ -177,7 +184,7 @@ class ClusterManager:
 
     def cluster_tf_idf_with_agglomerative_cluster(self, cluster_count, output_file_address=None):
         acm = AgglomerativeClustering(n_clusters=cluster_count)
-        labels = acm.fit_predict(self.corpus_tf_idf_vs)
+        labels = acm.fit_predict(self.corpus_tf_idf_vs_small.toarray())
         if output_file_address is not None:
             self._tf_idf_result_write_to_file(output_file_address, labels)
         return labels, acm

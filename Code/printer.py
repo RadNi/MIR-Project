@@ -14,5 +14,7 @@ class Printer:
             Printer.tab_str = Printer.tab_str[:-1]
 
     @staticmethod
-    def print(msg):
-        print(Printer.tab_str + msg)
+    def print(msg: str):
+        msg_lines = msg.split('\n')
+        for line in msg_lines:
+            print(Printer.tab_str + line.lstrip())
