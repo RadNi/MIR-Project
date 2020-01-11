@@ -103,7 +103,7 @@ class Parser:
 
 
 class EnglishParser(Parser):
-    Delimiters = [';', '#', ')', '(', '.', ':', '/', '?', '\\', ',', '\n', '&']
+    Delimiters = [';', '#', ')', '(', '.', ':', '/', '?', '\\', ',', '\n', '&', '@', '-', '_']
 
     def __init__(self, preload_corpus=True, is_data_tagged=False, corpus_address="DataSet/corpus/English.csv"):
         common_words_filename = "DataSet/common_words/english_common_words"
