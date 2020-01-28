@@ -16,3 +16,6 @@ soupsieve==1.9.5
 gensim==3.8.1
 sklearn
 selenium
+networkx
+scrapy
+twisted
